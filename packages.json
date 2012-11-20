@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.2",
+  "packages": [
+    {
+      "name": "ONN Sublime",
+      "description": "ONN stuff for Sublime Text 2",
+      "author": "onn",
+      "homepage": "https://github.com/onn/sublime",
+      "last_modified": "2012-11-20 11:19:00",
+      "platforms": {
+        "osx": [
+          {
+            "version": "0.0.1",
+            "url": "https://github.com/onn/sublime/zip/master"
+          }
+        ]
+      }
+    }
+  ]
+}
