@@ -11,10 +11,12 @@
         "osx": [
           {
             "version": "0.0.1",
-            "url": "https://github.com/onn/sublime/zip/master"
+            "url": "https://github.com/onn/sublime/archive/master.zip"
           }
         ]
       }
     }
   ]
 }
+
+
