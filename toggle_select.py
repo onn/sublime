@@ -9,6 +9,7 @@ class OnnStartSelectCommand(sublime_plugin.TextCommand):
         onnSelectingBlock = True
         cursor = [s for s in self.view.sel()]
         self.view.add_regions("onn_start", cursor, "", "", sublime.HIDDEN | sublime.PERSISTENT)
+        sublime.status_message("toggle select ON")
         
 class OnnCancelSelectCommand(sublime_plugin.TextCommand):
     def run(self, edit, **args):
@@ -19,6 +20,7 @@ class OnnCancelSelectCommand(sublime_plugin.TextCommand):
             self.view.erase_regions("onn_start")
             self.view.sel().clear()
             self.view.sel().add(sublime.Region(onn_start[0].end(), onn_start[0].end()))
+        sublime.status_message("toggle select canceled")
 
 class OnnCutCommand(sublime_plugin.TextCommand):
     def run(self, edit, **args):
