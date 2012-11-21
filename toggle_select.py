@@ -51,8 +51,7 @@ class OnnToggleSelectDetector(sublime_plugin.EventListener):
 
     def on_query_context(self, view, key, operator, operand, match_all):
         global onnSelectingBlock
-        if key == "onn_toggle_select":
-            if operator == sublime.OP_EQUAL:
-                return onnSelectingBlock == operand
+        if (key == "onn_toggle_select") and (operator == sublime.OP_EQUAL):
+            return (onnSelectingBlock == operand)
         else:
             return None
