@@ -1,3 +1,11 @@
 {
-	"auto_upgrade_last_run": 1353452477
+	"auto_upgrade_last_run": 1353458048,
+	"installed_packages":
+	[
+		"Git",
+		"LESS",
+		"Package Control",
+		"sublemacspro",
+		"WordHighlight"
+	]
 }
