@@ -1,4 +1,10 @@
 [
+  // quick panel of only currently open files - not sure if I like the specific keybind, but I love the functionality
+  { "keys": ["ctrl+x", "ctrl+b"], "command": "goto_open_file"},
+
+  // goto line
+  { "keys": ["ctrl+j","ctrl+l"], "command": "show_overlay", "args": {"overlay": "goto", "text": ":"} },
+
   // this is a copy of most (but not all) of the default keybindings for Escape, just mapped to ctrl+g instead
   { "keys": ["ctrl+g"], "command": "single_selection", "context":
     [
