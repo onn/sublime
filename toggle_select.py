@@ -16,6 +16,8 @@ class OnnStartSelectCommand(sublime_plugin.TextCommand):
 class OnnCancelSelectCommand(sublime_plugin.TextCommand):
     def run(self, edit, **args):
         global onnSelectingBlock
+        if (not onnSelectingBlock):
+            return
         onnSelectingBlock = False
         onn_start = self.view.get_regions("onn_start")
         if onn_start:
