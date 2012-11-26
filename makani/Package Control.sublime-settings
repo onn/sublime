@@ -1,6 +1,15 @@
 {
-	"auto_upgrade_last_run": 1353516653,
+	"auto_upgrade_last_run": 1353529905,
 	"installed_packages":
 	[
+		"AdvancedNewFile",
+		"FileDiffs",
+		"FileSystem Autocompletion",
+		"Git",
+		"Package Control",
+		"SideBarEnhancements",
+		"SideBarGit",
+		"SublimeLinter",
+		"SublimeTODO"
 	]
 }
