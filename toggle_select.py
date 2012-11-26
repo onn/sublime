@@ -3,6 +3,7 @@ import sublime_plugin
 
 onnSelectingBlock = False
 
+
 class OnnStartSelectCommand(sublime_plugin.TextCommand):
     def run(self, edit, **args):
         global onnSelectingBlock
@@ -10,7 +11,8 @@ class OnnStartSelectCommand(sublime_plugin.TextCommand):
         cursor = [s for s in self.view.sel()]
         self.view.add_regions("onn_start", cursor, "", "", sublime.HIDDEN | sublime.PERSISTENT)
         sublime.status_message("toggle select ON")
-        
+
+
 class OnnCancelSelectCommand(sublime_plugin.TextCommand):
     def run(self, edit, **args):
         global onnSelectingBlock
@@ -22,11 +24,13 @@ class OnnCancelSelectCommand(sublime_plugin.TextCommand):
             self.view.sel().add(sublime.Region(onn_start[0].end(), onn_start[0].end()))
         sublime.status_message("toggle select canceled")
 
+
 class OnnCutCommand(sublime_plugin.TextCommand):
     def run(self, edit, **args):
         global onnSelectingBlock
         onnSelectingBlock = False
         self.view.run_command("cut")
+
 
 class OnnCopyCommand(sublime_plugin.TextCommand):
     def run(self, edit, **args):
@@ -44,6 +48,7 @@ class OnnCopyCommand(sublime_plugin.TextCommand):
             self.view.sel().add(sublime.Region(cursor_begin, cursor_begin))
         else:
             self.view.sel().add(sublime.Region(cursor_end, cursor_end))
+
 
 class OnnToggleSelectDetector(sublime_plugin.EventListener):
     def __init__(self, *args, **kwargs):
