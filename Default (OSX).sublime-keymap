@@ -2,6 +2,9 @@
   // quick panel of only currently open files - not sure if I like the specific keybind, but I love the functionality
   { "keys": ["ctrl+x", "ctrl+b"], "command": "goto_open_file"},
 
+  // may not keep this long term, but it's handy for transition if nothing else
+  { "keys": ["ctrl+x", "ctrl+s"], "command": "save"},
+
   // goto line
   { "keys": ["ctrl+j","ctrl+l"], "command": "show_overlay", "args": {"overlay": "goto", "text": ":"} },
 
