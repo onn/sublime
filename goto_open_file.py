@@ -48,10 +48,8 @@ class ViewSelector(object):
         for folder in folders:
             if os.path.commonprefix([folder, view.file_name()]) == folder:
                 relpath = os.path.relpath(view.file_name(), folder)
-
-            if len(folders) > 1:
-                return os.path.join(os.path.basename(folder), relpath)
-
-            return relpath
+                if len(folders) > 1:
+                    return os.path.join(os.path.basename(folder), relpath)
+                return relpath
 
         return view.file_name()
