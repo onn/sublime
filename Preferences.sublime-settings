@@ -3,6 +3,7 @@
 	[
 		"Vintage"
 	],
+  "detect_indentation": false,
 	"open_files_in_new_window": false,
 	"show_full_path": true,
 	"tab_size": 2,

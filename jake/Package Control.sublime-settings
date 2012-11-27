@@ -1,11 +1,22 @@
 {
-	"auto_upgrade_last_run": 1353458048,
+	"auto_upgrade_last_run": null,
 	"installed_packages":
 	[
+		"AdvancedNewFile",
+		"Emmet",
 		"Git",
 		"LESS",
+		"Nettuts+ Fetch",
 		"Package Control",
+		"SearchInProject",
+		"SideBarEnhancements",
+		"SideBarGit",
 		"sublemacspro",
+		"SublimeLinter",
+		"SyncedSideBar",
+		"Theme - Phoenix",
+		"Theme - Soda",
+		"Twitter Bootstrap Snippets",
 		"WordHighlight"
 	]
 }

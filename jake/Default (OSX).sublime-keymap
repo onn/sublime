@@ -1,3 +1,13 @@
 [
-  { "keys": ["ctrl+z"], "command": "undo"}
+  { "keys": ["ctrl+z"], "command": "undo"},
+
+  // replace
+  { "keys": ["ctrl+j","ctrl+r"], "command": "show_panel", "args": {"panel": "replace"} },
+
+  // move forward and backword by words -- set in sublemeacs
+  { "keys": ["ctrl+u"], "command": "move", "args": {"by": "words", "forward": false}},
+  { "keys": ["ctrl+o"], "command": "move", "args": {"by": "word_ends", "forward": true}},
+  
+  { "keys": ["super+r"], "command": "show_overlay", "args": {"overlay":"goto", "show_files" : false, "text": "@"}} 
+  // sublemacs changes this to ctrl+alt+g
 ]
