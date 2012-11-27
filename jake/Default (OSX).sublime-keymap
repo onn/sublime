@@ -16,5 +16,11 @@
   { "keys": ["ctrl+x",")"], "command": "toggle_record_macro" },   
   { "keys": ["ctrl+x","e"], "command": "run_macro" },
 
-  { "keys": ["ctrl+x","ctrl+y","ctrl+q"], "command": "close_all" }
+  { "keys": ["ctrl+x","ctrl+y","ctrl+q"],
+    "command": "run_multiple_commands",
+    "args": {
+      "commands": [
+        {"command": "close_all"},
+        {"command": "quit"}
+        ]}}
 ]
