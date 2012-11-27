@@ -21,15 +21,14 @@ class RunMultipleCommandsCommand(sublime_plugin.TextCommand):
         context = self.view
         if 'context' in command:
             context_name = command['context']
-
-        if context_name == 'window':
-            context = context.window()
-        elif context_name == 'app':
-            context = sublime
-        elif context_name == 'text':
-            pass
-        else:
-            raise Exception('Invalid command context "' + context_name + '".')
+            if context_name == 'window':
+                context = context.window()
+            elif context_name == 'app':
+                context = sublime
+            elif context_name == 'text':
+                pass
+            else:
+                raise Exception('Invalid command context "' + context_name + '".')
 
         # skip args if not needed
         if args is None:
