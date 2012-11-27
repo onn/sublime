@@ -8,6 +8,13 @@
   { "keys": ["ctrl+u"], "command": "move", "args": {"by": "words", "forward": false}},
   { "keys": ["ctrl+o"], "command": "move", "args": {"by": "word_ends", "forward": true}},
   
-  { "keys": ["super+r"], "command": "show_overlay", "args": {"overlay":"goto", "show_files" : false, "text": "@"}} 
+  { "keys": ["super+r"], "command": "show_overlay", "args": {"overlay":"goto", "show_files" : false, "text": "@"}},
   // sublemacs changes this to ctrl+alt+g
+
+  // Setup macro recording and playback like emacs
+  { "keys": ["ctrl+x","("], "command": "toggle_record_macro" },
+  { "keys": ["ctrl+x",")"], "command": "toggle_record_macro" },   
+  { "keys": ["ctrl+x","e"], "command": "run_macro" },
+
+  { "keys": ["ctrl+x","ctrl+y","ctrl+q"], "command": "close_all" }
 ]
