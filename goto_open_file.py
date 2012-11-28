@@ -5,21 +5,18 @@ import os
 
 class GotoOpenFileCommand(sublime_plugin.TextCommand):
 
-    def run(self, edit, active_group=False):
+    def run(self, edit):
         window = sublime.active_window()
 
-        selector = ViewSelector(window, active_group)
+        selector = ViewSelector(window)
         window.show_quick_panel(selector.get_items(), selector.select)
 
 
 class ViewSelector(object):
 
-    def __init__(self, window, active_group):
+    def __init__(self, window):
         self.window = window
-        if active_group:
-            self.views = window.views_in_group(window.active_group())
-        else:
-            self.views = window.views()
+        self.views = window.views()
 
     def select(self, index):
         if index != -1:
