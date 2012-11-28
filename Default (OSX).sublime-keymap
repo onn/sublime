@@ -1,4 +1,7 @@
 [
+  { "keys": ["ctrl+y"], "command": "paste"},
+  { "keys": ["ctrl+k"], "command": "kill_to_clipboard"},
+
   { "keys": ["ctrl+z"], "command": "undo"},
   // incremental search
   { "keys": ["ctrl+s"], "command": "show_panel", "args": {"panel": "incremental_find", "reverse":false} },
