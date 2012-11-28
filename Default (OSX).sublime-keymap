@@ -1,4 +1,10 @@
 [
+  { "keys": ["ctrl+z"], "command": "undo"},
+  // incremental search
+  { "keys": ["ctrl+s"], "command": "show_panel", "args": {"panel": "incremental_find", "reverse":false} },
+  // incremental reverse search
+  { "keys": ["ctrl+r"], "command": "show_panel", "args": {"panel": "incremental_find", "reverse":true} },
+
   // quick panel of only currently open files - not sure if I like the specific keybind, but I love the functionality
   { "keys": ["ctrl+x", "ctrl+b"], "command": "goto_open_file"},
 
