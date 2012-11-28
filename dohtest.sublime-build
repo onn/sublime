@@ -1,0 +1,4 @@
+{
+  "cmd": ["dohtest", "$file"],  
+  "selector" : "source.ruby"
+}
