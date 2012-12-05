@@ -79,23 +79,22 @@ class OnnToggleSelectEvents(sublime_plugin.EventListener):
             return
 
         first_cursor = view.sel()[0]
-        first_onn = onn_start[0]
-        if first_cursor.empty() and (first_cursor.begin() != first_onn.begin()):
+        if first_cursor.empty() and (first_cursor.begin() != onn_start[0].begin()):
             view.erase_regions("onn_start")
             return
 
         if not onnSearching:
             return
 
-        block_select_count = 0
-        for region in view.sel():
-            if not region.empty():
-                block_select_count += 1
-            if block_select_count > 1:
-                print "multiple block selects, exiting"
-                return
-
-        print "extending selection in on_selection_modified event"
+        # now that we have a searching flag, I think this will never be needed,
+        # but keep it around for now, just in case
+        # block_select_count = 0
+        # for region in view.sel():
+        #     if not region.empty():
+        #         block_select_count += 1
+        #     if block_select_count > 1:
+        #         print "multiple block selects, exiting"
+        #         return
 
         num = min(len(onn_start), len(view.sel()))
         regions = []
@@ -113,5 +112,4 @@ class OnnToggleSelectEvents(sublime_plugin.EventListener):
     def on_activated(self, view):
         global onnSearching
         if view.get_regions("onn_start"):
-            print "found onn_start regions, setting searching to false"
             onnSearching = False
