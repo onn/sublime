@@ -4,6 +4,8 @@
   { "keys": ["ctrl+j", "ctrl+d"], "command": "git_diff_tool"},
   { "keys": ["ctrl+j", "ctrl+i"], "command": "reindent"},
   { "keys": ["ctrl+j", "ctrl+r"], "command": "show_panel", "args": {"panel": "replace"} },
+  // doing noop here so I can break the habit of using it for goto line before I use it for something else
+  { "keys": ["ctrl+j","ctrl+l"], "command": "noop"},
 
   { "keys": ["ctrl+w"], "command": "cut"},
   { "keys": ["ctrl+w"], "command": "onn_cut", "context":
@@ -25,8 +27,6 @@
   { "keys": ["ctrl+k"], "command": "kill_to_clipboard"},
 
   { "keys": ["ctrl+z"], "command": "undo"},
-  // incremental search
-  { "keys": ["ctrl+s"], "command": "show_panel", "args": {"panel": "incremental_find", "reverse":false} },
   // incremental reverse search
   { "keys": ["ctrl+r"], "command": "show_panel", "args": {"panel": "incremental_find", "reverse":true} },
 
@@ -35,9 +35,6 @@
 
   // may not keep this long term, but it's handy for transition if nothing else
   { "keys": ["ctrl+x", "ctrl+s"], "command": "save"},
-
-  // goto line
-  { "keys": ["ctrl+j","ctrl+l"], "command": "show_overlay", "args": {"overlay": "goto", "text": ":"} },
 
   // many of these are copies of the default keybindings for Escape, just mapped to ctrl+g instead, but with some tweaks
   { "keys": ["ctrl+g"], "command": "onn_cancel_select"},
