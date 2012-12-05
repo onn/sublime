@@ -86,6 +86,15 @@
     ]
   },
 
+  // tweaked pseudo incremental search stuff
+  { "keys": ["ctrl+s"], "command": "show_panel", "args": {"panel": "find", "reverse":false, "in_selection":false} },
+  { "keys": ["ctrl+s"], "command": "onn_find_next", "context":
+    [
+      {"key": "panel", "operand": "find"},
+      {"key": "panel_visible", "operator": "equal", "operand": true }
+    ]
+  },
+
   ////////////// basic movement keybinds from native Emacs
   { "keys": ["ctrl+a"], "command": "move_to", "args": {"to": "bol", "extend": false}},
   { "keys": ["ctrl+a"], "command": "move_to", "args": {"to": "bol", "extend": true}, "context":
