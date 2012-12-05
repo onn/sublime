@@ -12,9 +12,6 @@
   // may not keep this long term, but it's handy for transition if nothing else
   { "keys": ["ctrl+x", "ctrl+s"], "command": "save"},
 
-  // goto line
-  { "keys": ["ctrl+j","ctrl+l"], "command": "show_overlay", "args": {"overlay": "goto", "text": ":"} },
-
   // many of these are copies of the default keybindings for Escape, just mapped to ctrl+g instead, but with some tweaks
   { "keys": ["ctrl+g"], "command": "onn_cancel_select"},
   { "keys": ["ctrl+g"], "command": "single_selection", "context":
