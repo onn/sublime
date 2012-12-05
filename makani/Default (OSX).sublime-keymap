@@ -85,6 +85,25 @@
       { "key": "panel_visible", "operator": "equal", "operand": true }
     ]
   },
+  { "keys": ["enter"], "command": "hide_panel", "args": {"cancel": true},
+    "context":
+    [
+      {"key": "panel", "operand": "find"},
+      { "key": "panel_visible", "operator": "equal", "operand": true }
+    ]
+  },  { "keys": ["enter"], "command": "hide_panel", "args": {"cancel": true},
+    "context":
+    [
+      {"key": "panel", "operand": "incremental_find"},
+      { "key": "panel_visible", "operator": "equal", "operand": true }
+    ]
+  },  { "keys": ["enter"], "command": "hide_panel", "args": {"cancel": true},
+    "context":
+    [
+      {"key": "panel", "operand": "replace"},
+      { "key": "panel_visible", "operator": "equal", "operand": true }
+    ]
+  },
 
   // block select
   { "keys": ["ctrl+space"], "command": "onn_start_select" },
