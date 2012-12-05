@@ -1,64 +1,117 @@
 import sublime
 import sublime_plugin
 
-onnSelectingBlock = False
+onnSearching = False
 
 
 class OnnStartSelectCommand(sublime_plugin.TextCommand):
     def run(self, edit, **args):
-        global onnSelectingBlock
-        onnSelectingBlock = True
+        global onnSearching
+        onnSearching = False
         cursor = [s for s in self.view.sel()]
-        self.view.add_regions("onn_start", cursor, "", "", sublime.HIDDEN | sublime.PERSISTENT)
+        self.view.add_regions("onn_start", cursor, "onn_start", "dot", sublime.HIDDEN | sublime.PERSISTENT)
         sublime.status_message("toggle select ON")
 
 
 class OnnCancelSelectCommand(sublime_plugin.TextCommand):
     def run(self, edit, **args):
-        global onnSelectingBlock
-        if (not onnSelectingBlock):
-            return
-        onnSelectingBlock = False
+        global onnSearching
+        onnSearching = False
         onn_start = self.view.get_regions("onn_start")
-        if onn_start:
-            self.view.erase_regions("onn_start")
+        if not onn_start:
+            end_point = self.view.sel()[0].b
             self.view.sel().clear()
-            self.view.sel().add(sublime.Region(onn_start[0].end(), onn_start[0].end()))
+            self.view.sel().add(sublime.Region(end_point, end_point))
+            return
+
+        regions = []
+        for cursor_region in self.view.sel():
+            new_cursor = cursor_region.b
+            regions.append(sublime.Region(new_cursor, new_cursor))
+
+        self.view.erase_regions("onn_start")
+        self.view.sel().clear()
+        for regobj in regions:
+            self.view.sel().add(regobj)
+
         sublime.status_message("toggle select canceled")
 
 
 class OnnCutCommand(sublime_plugin.TextCommand):
     def run(self, edit, **args):
-        global onnSelectingBlock
-        onnSelectingBlock = False
+        global onnSearching
+        onnSearching = False
         self.view.run_command("cut")
+        self.view.erase_regions("onn_start")
 
 
 class OnnCopyCommand(sublime_plugin.TextCommand):
     def run(self, edit, **args):
-        global onnSelectingBlock
+        global onnSearching
+        onnSearching = False
         self.view.run_command("copy")
-        onnSelectingBlock = False
-        cursor = [s for s in self.view.sel()]
-        cursor_begin = cursor[0].begin()
-        cursor_end = cursor[0].end()
-        onn_start = self.view.get_regions("onn_start")
-        onn_begin = onn_start[0].begin()
-        self.view.erase_regions("onn_start")
-        self.view.sel().clear()
-        if cursor_begin < onn_begin:
-            self.view.sel().add(sublime.Region(cursor_begin, cursor_begin))
-        else:
-            self.view.sel().add(sublime.Region(cursor_end, cursor_end))
+        self.view.run_command("onn_cancel_select")
 
 
-class OnnToggleSelectDetector(sublime_plugin.EventListener):
+class OnnFindNextCommand(sublime_plugin.TextCommand):
+    def run(self, edit, **args):
+        global onnSearching
+        onnSearching = True
+        self.view.window().run_command("find_next")
+
+
+class OnnToggleSelectEvents(sublime_plugin.EventListener):
     def __init__(self, *args, **kwargs):
         sublime_plugin.EventListener.__init__(self, *args, **kwargs)
 
     def on_query_context(self, view, key, operator, operand, match_all):
-        global onnSelectingBlock
         if (key == "onn_toggle_select") and (operator == sublime.OP_EQUAL):
-            return (onnSelectingBlock == operand)
+            onn_start = view.get_regions("onn_start")
+            return (bool(onn_start) == operand)
         else:
             return None
+
+    def on_selection_modified(self, view):
+        global onnSearching
+
+        onn_start = view.get_regions("onn_start")
+        if not onn_start:
+            return
+
+        first_cursor = view.sel()[0]
+        first_onn = onn_start[0]
+        if first_cursor.empty() and (first_cursor.begin() != first_onn.begin()):
+            view.erase_regions("onn_start")
+            return
+
+        if not onnSearching:
+            return
+
+        block_select_count = 0
+        for region in view.sel():
+            if not region.empty():
+                block_select_count += 1
+            if block_select_count > 1:
+                print "multiple block selects, exiting"
+                return
+
+        print "extending selection in on_selection_modified event"
+
+        num = min(len(onn_start), len(view.sel()))
+        regions = []
+
+        for index in xrange(num):
+            regions.append(view.sel()[index].cover(onn_start[index]))
+
+        for index in xrange(num, len(view.sel())):
+            regions.append(view.sel()[index])
+
+        view.sel().clear()
+        for regobj in regions:
+            view.sel().add(regobj)
+
+    def on_activated(self, view):
+        global onnSearching
+        if view.get_regions("onn_start"):
+            print "found onn_start regions, setting searching to false"
+            onnSearching = False
