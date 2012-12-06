@@ -1,11 +1,12 @@
 {
   "color_scheme": "Packages/Color Scheme - Default/Twilight.tmTheme",
-  "detect_indentation": false,
   "font_size": 13.0,
+
   "ignored_packages":
   [
-	  "Vintage"
+    "Vintage"
   ],
+  "detect_indentation": false,
   "open_files_in_new_window": false,
   "show_full_path": true,
   "tab_size": 2,
