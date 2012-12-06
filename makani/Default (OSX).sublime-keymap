@@ -125,7 +125,8 @@
   },
 
   // tweaked pseudo incremental search stuff
-  { "keys": ["ctrl+s"], "command": "show_panel", "args": {"panel": "find", "reverse":false, "in_selection":false} },
+  // { "keys": ["ctrl+s"], "command": "show_panel", "args": {"panel": "find", "reverse":false, "in_selection":false} },
+  { "keys": ["ctrl+s"], "command": "onn_show_find"},
   { "keys": ["ctrl+s"], "command": "onn_find_next", "context":
     [
       {"key": "panel", "operand": "find"},
