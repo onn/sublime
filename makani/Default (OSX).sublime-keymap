@@ -1,26 +1,4 @@
 [
-  { "keys": ["ctrl+/"], "command": "undo"},
-
-  { "keys": ["ctrl+j", "ctrl+d"], "command": "git_diff_tool"},
-  { "keys": ["ctrl+j", "ctrl+i"], "command": "reindent"},
-  { "keys": ["ctrl+j", "ctrl+r"], "command": "show_panel", "args": {"panel": "replace"} },
-  // doing noop here so I can break the habit of using it for goto line before I use it for something else
-  { "keys": ["ctrl+j","ctrl+l"], "command": "noop"},
-
-  { "keys": ["ctrl+w"], "command": "cut"},
-  { "keys": ["ctrl+w"], "command": "onn_cut", "context":
-    [
-      { "key": "onn_toggle_select", "operator": "equal", "operand": true }
-    ]
-  },
-
-  { "keys": ["ctrl+c"], "command": "copy"},
-  { "keys": ["ctrl+c"], "command": "onn_copy", "context":
-    [
-      { "key": "onn_toggle_select", "operator": "equal", "operand": true }
-    ]
-  },
-
   ////////////////////////////////////////// same as our shared onn plugin keybindings, but put here so they stick
 
   { "keys": ["ctrl+y"], "command": "yank_from_clipboard"},
@@ -124,6 +102,20 @@
     ]
   },
 
+  { "keys": ["ctrl+w"], "command": "cut"},
+  { "keys": ["ctrl+w"], "command": "onn_cut", "context":
+    [
+      { "key": "onn_toggle_select", "operator": "equal", "operand": true }
+    ]
+  },
+
+  { "keys": ["ctrl+c"], "command": "copy"},
+  { "keys": ["ctrl+c"], "command": "onn_copy", "context":
+    [
+      { "key": "onn_toggle_select", "operator": "equal", "operand": true }
+    ]
+  },
+
   // tweaked pseudo incremental search stuff
   // { "keys": ["ctrl+s"], "command": "show_panel", "args": {"panel": "find", "reverse":false, "in_selection":false} },
   { "keys": ["ctrl+s"], "command": "onn_show_find"},
@@ -179,8 +171,8 @@
       { "key": "onn_toggle_select", "operator": "equal", "operand": true }
     ]
   },
-  { "keys": ["ctrl+o"], "command": "move", "args": {"by": "words", "forward": true, "extend": false}},
-  { "keys": ["ctrl+o"], "command": "move", "args": {"by": "words", "forward": true, "extend": true}, "context":
+  { "keys": ["ctrl+o"], "command": "move", "args": {"by": "word_ends", "forward": true, "extend": false}},
+  { "keys": ["ctrl+o"], "command": "move", "args": {"by": "word_ends", "forward": true, "extend": true}, "context":
     [
       { "key": "onn_toggle_select", "operator": "equal", "operand": true }
     ]
@@ -213,4 +205,18 @@
   ////////////// basic editing keybinds from Emacs
   { "keys": ["ctrl+h"], "command": "left_delete"},
   { "keys": ["ctrl+d"], "command": "right_delete"}
+
+  ////////////////////////////////////////// put all my custom ones here so I can overwrite if needed
+
+  ,{ "keys": ["ctrl+z"], "command": "noop"},
+  { "keys": ["ctrl+/"], "command": "undo"},
+
+  { "keys": ["super+u"], "command": "upper_case" },
+  { "keys": ["super+l"], "command": "lower_case" },
+
+  { "keys": ["ctrl+j", "ctrl+d"], "command": "git_diff_tool"},
+  { "keys": ["ctrl+j", "ctrl+i"], "command": "reindent"},
+  { "keys": ["ctrl+j", "ctrl+r"], "command": "show_panel", "args": {"panel": "replace"} },
+  { "keys": ["ctrl+j","ctrl+l"], "command": "show_overlay", "args": {"overlay": "goto", "text": ":"} },
+  { "keys": ["ctrl+j","ctrl+f"], "command": "show_overlay", "args": {"overlay": "goto", "text": "@"} }
 ]

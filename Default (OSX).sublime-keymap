@@ -100,6 +100,20 @@
     ]
   },
 
+  { "keys": ["ctrl+w"], "command": "cut"},
+  { "keys": ["ctrl+w"], "command": "onn_cut", "context":
+    [
+      { "key": "onn_toggle_select", "operator": "equal", "operand": true }
+    ]
+  },
+
+  { "keys": ["ctrl+c"], "command": "copy"},
+  { "keys": ["ctrl+c"], "command": "onn_copy", "context":
+    [
+      { "key": "onn_toggle_select", "operator": "equal", "operand": true }
+    ]
+  },
+
   // tweaked pseudo incremental search stuff
   // { "keys": ["ctrl+s"], "command": "show_panel", "args": {"panel": "find", "reverse":false, "in_selection":false} },
   { "keys": ["ctrl+s"], "command": "onn_show_find"},
@@ -155,8 +169,8 @@
       { "key": "onn_toggle_select", "operator": "equal", "operand": true }
     ]
   },
-  { "keys": ["ctrl+o"], "command": "move", "args": {"by": "words", "forward": true, "extend": false}},
-  { "keys": ["ctrl+o"], "command": "move", "args": {"by": "words", "forward": true, "extend": true}, "context":
+  { "keys": ["ctrl+o"], "command": "move", "args": {"by": "word_ends", "forward": true, "extend": false}},
+  { "keys": ["ctrl+o"], "command": "move", "args": {"by": "word_ends", "forward": true, "extend": true}, "context":
     [
       { "key": "onn_toggle_select", "operator": "equal", "operand": true }
     ]
