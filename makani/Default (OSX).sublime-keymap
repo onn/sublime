@@ -5,8 +5,6 @@
   { "keys": ["ctrl+k"], "command": "kill_to_clipboard"},
 
   { "keys": ["ctrl+z"], "command": "undo"},
-  // incremental reverse search
-  { "keys": ["ctrl+r"], "command": "show_panel", "args": {"panel": "incremental_find", "reverse":true} },
 
   // quick panel of only currently open files - sort of like emacs switch buffer
   { "keys": ["ctrl+x", "b"], "command": "goto_open_file"},
@@ -117,9 +115,16 @@
   },
 
   // tweaked pseudo incremental search stuff
-  // { "keys": ["ctrl+s"], "command": "show_panel", "args": {"panel": "find", "reverse":false, "in_selection":false} },
   { "keys": ["ctrl+s"], "command": "onn_show_find"},
   { "keys": ["ctrl+s"], "command": "onn_find_next", "context":
+    [
+      {"key": "panel", "operand": "find"},
+      {"key": "panel_visible", "operator": "equal", "operand": true }
+    ]
+  },
+
+  { "keys": ["ctrl+r"], "command": "onn_show_reverse_find"},
+  { "keys": ["ctrl+r"], "command": "onn_find_next", "context":
     [
       {"key": "panel", "operand": "find"},
       {"key": "panel_visible", "operator": "equal", "operand": true }

@@ -56,9 +56,15 @@ class OnnCopyCommand(sublime_plugin.TextCommand):
 class OnnShowFindCommand(sublime_plugin.WindowCommand):
     def run(self, **args):
         global onnSearching
-        print "in show find, setting searching to true"
         onnSearching = True
         self.window.run_command("show_panel", {"panel": "find", "reverse": False, "in_selection": False})
+
+
+class OnnShowReverseFindCommand(sublime_plugin.WindowCommand):
+    def run(self, **args):
+        global onnSearching
+        onnSearching = True
+        self.window.run_command("show_panel", {"panel": "find", "reverse": True, "in_selection": False})
 
 
 class OnnFindNextCommand(sublime_plugin.TextCommand):
