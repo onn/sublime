@@ -17,14 +17,16 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         else:
             file_name = current_file.split("/")[-1]
             tab_name = file_name
-            window.run_command("save")
 
         self.tab_name = tab_name
         self.file_name = file_name
         self.window = window
 
         region = self.view.sel()[0]
-        args = self.view.substr(region)
+        if region.empty():
+            args = self.view.substr(self.view.line(region.a))
+        else:
+            args = self.view.substr(region)
         cmd = '/usr/local/mysql/bin/mysql -uroot -t -e"' + args + '"'
 
         output = ''
