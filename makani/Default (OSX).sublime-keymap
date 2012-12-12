@@ -219,6 +219,7 @@
   { "keys": ["super+u"], "command": "upper_case" },
   { "keys": ["super+l"], "command": "lower_case" },
   { "keys": ["super+shift+g"], "command": "find_all_under" },
+  { "keys": ["ctrl+j", "ctrl+m"], "command": "run_mysql"},
 
   { "keys": ["ctrl+j", "ctrl+d"], "command": "git_diff_tool"},
   { "keys": ["ctrl+j", "ctrl+i"], "command": "reindent"},
