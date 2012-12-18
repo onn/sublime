@@ -4,7 +4,7 @@ import sublime_plugin
 
 
 class RunMysqlCommand(sublime_plugin.TextCommand):
-    SQLSTMT_STARTS = frozenset(['select', 'update', 'delete', 'insert', 'replace', 'use', 'load'])
+    SQLSTMT_STARTS = frozenset(['select', 'update', 'delete', 'insert', 'replace', 'use', 'load', 'describe', 'desc', 'explain', 'create', 'alter'])
 
     def send_sql(self, stmt):
         cmd = '/usr/local/mysql/bin/mysql -uroot -t -e"' + stmt + '" lsfs_main'
@@ -80,11 +80,15 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         lreg = cursor_lreg
         while True:
             end_stmt = lreg.end()
+            if end_stmt >= max_end:
+                break
             line = self.view.substr(lreg)
             if len(line) == 0 or line[-1] == ';' or line.isspace():
                 break
-            if end_stmt >= max_end:
-                return ''
+            curr_begin = lreg.begin()
+            if (curr_begin > begin_stmt) and self.has_sqlstmt_start(line):
+                end_stmt = curr_begin - 1
+                break
             lreg = self.view.line(end_stmt + 1)
 
         return self.view.substr(sublime.Region(begin_stmt, end_stmt)).strip()
