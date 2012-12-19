@@ -1,0 +1,29 @@
+[  ////////////////////////////////////////// put all my custom ones here so I can overwrite if needed
+
+  { "keys": ["ctrl+z"], "command": "noop"},
+  { "keys": ["ctrl+/"], "command": "undo"},
+
+  { "keys": ["super+u"], "command": "upper_case" },
+  { "keys": ["super+l"], "command": "lower_case" },
+  { "keys": ["super+shift+g"], "command": "find_all_under" },
+  { "keys": ["ctrl+j", "ctrl+m"], "command": "run_mysql"},
+  { "keys": ["ctrl+x", "2"], "command": "create_pane_with_file", "args": {"direction": "right"} },
+
+  {
+    "keys": ["ctrl+x","1"],
+    "command": "set_layout",
+    "args":
+    {
+      "cols": [0.0, 1.0],
+      "rows": [0.0, 1.0],
+      "cells": [[0, 0, 1, 1]]
+    }
+  },
+
+
+  { "keys": ["ctrl+j", "ctrl+d"], "command": "git_diff_tool"},
+  { "keys": ["ctrl+j", "ctrl+i"], "command": "reindent"},
+  { "keys": ["ctrl+j", "ctrl+r"], "command": "show_panel", "args": {"panel": "replace"} },
+  { "keys": ["ctrl+j","ctrl+l"], "command": "show_overlay", "args": {"overlay": "goto", "text": ":"} },
+  { "keys": ["ctrl+j","ctrl+f"], "command": "show_overlay", "args": {"overlay": "goto", "text": "@"} }
+]
