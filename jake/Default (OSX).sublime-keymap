@@ -1,74 +1,14 @@
 [
-  // fix ctrl+p to work with mak's kill/yank
-  { "keys": ["ctrl+p"], "command": "move", "args": {"by": "lines", "extend": false, "forward": false} },
-  // { "keys": ["ctrl+p"], "command": "move", "args": {"by": "lines", "forward": false, "extend": true}, "context":
-  //   [
-  //       { "key": "sbp_emacs_has_mark", "operator": "equal", "operand": true }
-  //   ]
-  // },
-
-  // permute lines (unique & reverse)
-  // { "keys": ["ctrl+p","ctrl+l","ctrl+u"], "command": "permute_lines", "args": {"operation": "unique"}},
-  // { "keys": ["ctrl+p","ctrl+l","ctrl+r"], "command": "permute_lines", "args": {"operation": "reverse"}},
-
-  { "keys": ["ctrl+z"], "command": "undo"},
-
-  // replace
-  { "keys": ["ctrl+j","ctrl+r"], "command": "show_panel", "args": {"panel": "replace"} },
-
-  // move forward and backword by words -- set in sublemeacs
-  { "keys": ["ctrl+u"], "command": "move", "args": {"by": "words", "forward": false}},
-  { "keys": ["ctrl+o"], "command": "move", "args": {"by": "word_ends", "forward": true}},
-
-  // sublemacs changes this to ctrl+alt+g
-  { "keys": ["super+r"], "command": "show_overlay", "args": {"overlay":"goto", "show_files" : false, "text": "@"}},
-
-  // Setup macro recording and playback like emacs
-  { "keys": ["ctrl+x","("], "command": "toggle_record_macro" },
-  { "keys": ["ctrl+x",")"], "command": "toggle_record_macro" },
-  { "keys": ["ctrl+x","e"], "command": "run_macro" },
-
-  { "keys": ["ctrl+x","ctrl+w"], "command": "prompt_save_as" },
-
-  { "keys": ["ctrl+shift+super+f"],
-    "command": "run_multiple_commands",
-    "args": {
-      "commands": [
-        {"command": "find_under_expand", "context": "window"},
-        {"command": "slurp_find_string", "context": "window"},
-        {"command": "show_panel", "args": {"panel": "find"}, "context": "window"}
-      ]}},
-
-  { "keys": ["ctrl+x","ctrl+y","ctrl+q"],
-    "command": "run_multiple_commands",
-    "args": {
-      "commands": [
-        {"command": "close_all", "context": "window"},
-        {"command": "hot_exit", "context": "app"}
-        ]}},
-
-  { "keys": ["ctrl+v"], "command": "noop"},
-
-  //
-  // Copied from onn/keybindings:
-  //
   { "keys": ["ctrl+y"], "command": "yank_from_clipboard"},
   { "keys": ["ctrl+k"], "command": "kill_to_clipboard"},
 
   { "keys": ["ctrl+z"], "command": "undo"},
-  // incremental search
-  { "keys": ["ctrl+s"], "command": "show_panel", "args": {"panel": "incremental_find", "reverse":false} },
-  // incremental reverse search
-  { "keys": ["ctrl+r"], "command": "show_panel", "args": {"panel": "incremental_find", "reverse":true} },
 
   // quick panel of only currently open files - sort of like emacs switch buffer
   { "keys": ["ctrl+x", "b"], "command": "goto_open_file"},
 
   // may not keep this long term, but it's handy for transition if nothing else
   { "keys": ["ctrl+x", "ctrl+s"], "command": "save"},
-
-  // goto line
-  { "keys": ["ctrl+j","ctrl+l"], "command": "show_overlay", "args": {"overlay": "goto", "text": ":"} },
 
   // many of these are copies of the default keybindings for Escape, just mapped to ctrl+g instead, but with some tweaks
   { "keys": ["ctrl+g"], "command": "onn_cancel_select"},
@@ -119,6 +59,25 @@
       { "key": "panel_visible", "operator": "equal", "operand": true }
     ]
   },
+  { "keys": ["enter"], "command": "hide_panel", "args": {"cancel": true},
+    "context":
+    [
+      {"key": "panel", "operand": "find"},
+      { "key": "panel_visible", "operator": "equal", "operand": true }
+    ]
+  },  { "keys": ["enter"], "command": "hide_panel", "args": {"cancel": true},
+    "context":
+    [
+      {"key": "panel", "operand": "incremental_find"},
+      { "key": "panel_visible", "operator": "equal", "operand": true }
+    ]
+  },  { "keys": ["enter"], "command": "hide_panel", "args": {"cancel": true},
+    "context":
+    [
+      {"key": "panel", "operand": "replace"},
+      { "key": "panel_visible", "operator": "equal", "operand": true }
+    ]
+  },
 
   // block select
   { "keys": ["ctrl+space"], "command": "onn_start_select" },
@@ -134,6 +93,20 @@
     ]
   },
   { "keys": ["super+c"], "command": "onn_copy", "context":
+    [
+      { "key": "onn_toggle_select", "operator": "equal", "operand": true }
+    ]
+  },
+
+  { "keys": ["ctrl+w"], "command": "cut"},
+  { "keys": ["ctrl+w"], "command": "onn_cut", "context":
+    [
+      { "key": "onn_toggle_select", "operator": "equal", "operand": true }
+    ]
+  },
+
+  { "keys": ["ctrl+c"], "command": "copy"},
+  { "keys": ["ctrl+c"], "command": "onn_copy", "context":
     [
       { "key": "onn_toggle_select", "operator": "equal", "operand": true }
     ]
@@ -201,8 +174,8 @@
       { "key": "onn_toggle_select", "operator": "equal", "operand": true }
     ]
   },
-  { "keys": ["ctrl+o"], "command": "move", "args": {"by": "words", "forward": true, "extend": false}},
-  { "keys": ["ctrl+o"], "command": "move", "args": {"by": "words", "forward": true, "extend": true}, "context":
+  { "keys": ["ctrl+o"], "command": "move", "args": {"by": "word_ends", "forward": true, "extend": false}},
+  { "keys": ["ctrl+o"], "command": "move", "args": {"by": "word_ends", "forward": true, "extend": true}, "context":
     [
       { "key": "onn_toggle_select", "operator": "equal", "operand": true }
     ]
@@ -234,6 +207,57 @@
 
   ////////////// basic editing keybinds from Emacs
   { "keys": ["ctrl+h"], "command": "left_delete"},
-  { "keys": ["ctrl+d"], "command": "right_delete"}
+  { "keys": ["ctrl+d"], "command": "right_delete"},
+
+
+/*
+  -=- /Users/jake/src/sublime/jake/jake.sublime-keymap -=-
+*/
+
+
+  // fix ctrl+p to work with mak's kill/yank
+  { "keys": ["ctrl+p"], "command": "move", "args": {"by": "lines", "extend": false, "forward": false} },
+
+  // permute lines (unique & reverse)
+  // { "keys": ["ctrl+p","ctrl+l","ctrl+u"], "command": "permute_lines", "args": {"operation": "unique"}},
+  // { "keys": ["ctrl+p","ctrl+l","ctrl+r"], "command": "permute_lines", "args": {"operation": "reverse"}},
+
+  { "keys": ["ctrl+z"], "command": "undo"},
+
+  // replace
+  { "keys": ["ctrl+j","ctrl+r"], "command": "show_panel", "args": {"panel": "replace"} },
+
+  // move forward and backword by words -- set in sublemeacs
+  { "keys": ["ctrl+u"], "command": "move", "args": {"by": "words", "forward": false}},
+  { "keys": ["ctrl+o"], "command": "move", "args": {"by": "word_ends", "forward": true}},
+
+  // sublemacs changes this to ctrl+alt+g
+  { "keys": ["super+r"], "command": "show_overlay", "args": {"overlay":"goto", "show_files" : false, "text": "@"}},
+
+  // Setup macro recording and playback like emacs
+  { "keys": ["ctrl+x","("], "command": "toggle_record_macro" },
+  { "keys": ["ctrl+x",")"], "command": "toggle_record_macro" },
+  { "keys": ["ctrl+x","e"], "command": "run_macro" },
+
+  { "keys": ["ctrl+x","ctrl+w"], "command": "prompt_save_as" },
+
+  { "keys": ["ctrl+shift+super+f"],
+    "command": "run_multiple_commands",
+    "args": {
+      "commands": [
+        {"command": "find_under_expand", "context": "window"},
+        {"command": "slurp_find_string", "context": "window"},
+        {"command": "show_panel", "args": {"panel": "find"}, "context": "window"}
+      ]}},
+
+  { "keys": ["ctrl+x","ctrl+y","ctrl+q"],
+    "command": "run_multiple_commands",
+    "args": {
+      "commands": [
+        {"command": "close_all", "context": "window"},
+        {"command": "hot_exit", "context": "app"}
+        ]}},
+
+  { "keys": ["ctrl+v"], "command": "noop"}
 
 ]
