@@ -215,8 +215,14 @@
 */
 
 
-  // fix ctrl+p to work with mak's kill/yank
-  { "keys": ["ctrl+p"], "command": "move", "args": {"by": "lines", "extend": false, "forward": false} },
+  { "keys": ["ctrl+j", "ctrl+m"], "command": "run_mysql"},
+
+  { "keys": ["ctrl+j", "ctrl+d"], "command": "git_diff_tool"},
+  { "keys": ["ctrl+j", "ctrl+i"], "command": "reindent"},
+  { "keys": ["ctrl+j", "ctrl+r"], "command": "show_panel", "args": {"panel": "replace"} },
+  { "keys": ["ctrl+j","ctrl+l"], "command": "show_overlay", "args": {"overlay": "goto", "text": ":"} },
+  { "keys": ["ctrl+j","ctrl+f"], "command": "show_overlay", "args": {"overlay": "goto", "text": "@"} },
+
 
   // permute lines (unique & reverse)
   // { "keys": ["ctrl+p","ctrl+l","ctrl+u"], "command": "permute_lines", "args": {"operation": "unique"}},
@@ -224,14 +230,6 @@
 
   { "keys": ["ctrl+z"], "command": "undo"},
 
-  // replace
-  { "keys": ["ctrl+j","ctrl+r"], "command": "show_panel", "args": {"panel": "replace"} },
-
-  // move forward and backword by words -- set in sublemeacs
-  { "keys": ["ctrl+u"], "command": "move", "args": {"by": "words", "forward": false}},
-  { "keys": ["ctrl+o"], "command": "move", "args": {"by": "word_ends", "forward": true}},
-
-  // sublemacs changes this to ctrl+alt+g
   { "keys": ["super+r"], "command": "show_overlay", "args": {"overlay":"goto", "show_files" : false, "text": "@"}},
 
   // Setup macro recording and playback like emacs
@@ -250,6 +248,7 @@
         {"command": "show_panel", "args": {"panel": "find"}, "context": "window"}
       ]}},
 
+  // Shut them all down!!
   { "keys": ["ctrl+x","ctrl+y","ctrl+q"],
     "command": "run_multiple_commands",
     "args": {
@@ -258,101 +257,5 @@
         {"command": "hot_exit", "context": "app"}
         ]}},
 
-  { "keys": ["ctrl+v"], "command": "noop"},
-
-  // copy of keybindings in emmet
-    {
-          "keys": [
-            "tab"
-        ],
-        "command": "expand_abbreviation_by_tab",
-        "context": [
-            {
-                "operand": "source.css, source.sass, source.less, source.scss, source.stylus, text.xml, text.html, text.haml, text.scala.html, source string",
-                "operator": "equal",
-                "match_all": true,
-                "key": "selector"
-            },
-            {
-                "operand": "text.html source.php, storage.type.templatetag.django",
-                "operator": "not_equal",
-                "match_all": true,
-                "key": "selector"
-            },
-            {
-                "match_all": true,
-                "key": "selection_empty"
-            },
-            {
-                "operator": "equal",
-                "operand": false,
-                "match_all": true,
-                "key": "has_next_field"
-            },
-            {
-                "operator": "equal",
-                "operand": false,
-                "match_all": true,
-                "key": "setting.disable_tab_abbreviations"
-            },
-            {
-                "operand": false,
-                "operator": "equal",
-                "match_all": true,
-                "key": "auto_complete_visible"
-            },
-            {
-                "match_all": true,
-                "key": "is_abbreviation"
-            }
-        ]
-    },
-    {
-        "keys": [
-            "tab"
-        ],
-        "command": "expand_abbreviation_by_tab",
-        "context": [
-            {
-                "operand": "source.css, source.sass, source.less, source.scss, source.stylus, text.xml, text.html, text.haml, text.scala.html, source string",
-                "operator": "equal",
-                "match_all": true,
-                "key": "selector"
-            },
-            {
-                "operand": "text.html source.php, storage.type.templatetag.django",
-                "operator": "not_equal",
-                "match_all": true,
-                "key": "selector"
-            },
-            {
-                "match_all": true,
-                "key": "selection_empty"
-            },
-            {
-                "operator": "equal",
-                "operand": false,
-                "match_all": true,
-                "key": "has_next_field"
-            },
-            {
-                "operator": "equal",
-                "operand": true,
-                "match_all": true,
-                "key": "auto_complete_visible"
-            },
-            {
-                "operator": "equal",
-                "operand": false,
-                "match_all": true,
-                "key": "setting.disable_tab_abbreviations_on_auto_complete"
-            },
-            {
-                "match_all": true,
-                "key": "is_abbreviation"
-            }
-        ]
-    }
-
-
+  { "keys": ["ctrl+v"], "command": "noop"}
 ]
