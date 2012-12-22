@@ -178,6 +178,7 @@ class SublimeFiles
 
 
     if self.changed?
+      # Need to check the dates on the files (mtime) to determine if there are changes to write to output or the other way
       self.split_output_file
       puts "Updating #{@default_file} and #{@user_file}"
       string_to_file(wrap_str(@default_contents,true),@default_file)
