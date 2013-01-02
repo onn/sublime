@@ -82,13 +82,13 @@ class SublimeFiles
   def wrap_str(str,first)
     if str != nil && str.length > 1
       if first
-        if str[0] == '['
+        if str[0].chr == '['
           return str[0..str.rindex(",")-1] + "\n]\n"
         else
           raise "Unexpected character str[0]=\"#{str[0]}\" "
         end
       else
-        if str[-1] != '['
+        if str[-1].chr != '['
           return "[" + str
         else
           raise "Unexpected character str[0]=\"#{str[0]}\" "
@@ -105,7 +105,7 @@ class SublimeFiles
       if first
         return str[0..str.rindex(/\}(?!.)/)] + ",\n"
       else
-        if str[0] == '['
+        if str[0].chr == '['
           return str[1..-1]
         else
           raise "Unexpected character str[0]=\"#{str[0]}\" "
