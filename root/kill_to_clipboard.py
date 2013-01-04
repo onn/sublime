@@ -41,11 +41,11 @@ class KillToClipboardCommand(sublime_plugin.TextCommand):
 
         text_items = []
         regions = []
-        for s in self.view.sel():
-            if s.empty():
-                s = sublime.Region(s.a, s.a + 1)
-            text_items.append(self.view.substr(s))
-            regions.append(s)
+        for selreg in self.view.sel():
+            if selreg.empty():
+                selreg = sublime.Region(selreg.a, selreg.a + 1)
+            text_items.append(self.view.substr(selreg))
+            regions.append(selreg)
         text = "\n".join(text_items)
 
         kill_location.performed_kill(self.view, regions)
