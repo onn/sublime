@@ -61,3 +61,11 @@ class YankFromClipboardCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         kill_location.lock()
         self.view.run_command("paste")
+
+
+class KillToClipboardEvents(sublime_plugin.EventListener):
+    def on_close(self, view):
+        kill_location.lock()
+
+    def on_activated(self, view):
+        kill_location.lock()
