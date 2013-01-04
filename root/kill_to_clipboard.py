@@ -78,6 +78,5 @@ class KillToClipboardEvents(sublime_plugin.EventListener):
         kill_location.lock()
 
     def on_selection_modified(self, view):
-        print "kill_to_clipboard: inside on_selection_modified"
         if not kill_location.is_locked():
             kill_location.check_for_cursor_change(view, False)
