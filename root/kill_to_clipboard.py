@@ -64,8 +64,5 @@ class YankFromClipboardCommand(sublime_plugin.TextCommand):
 
 
 class KillToClipboardEvents(sublime_plugin.EventListener):
-    def on_close(self, view):
-        kill_location.lock()
-
     def on_activated(self, view):
         kill_location.lock()
