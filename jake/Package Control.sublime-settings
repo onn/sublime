@@ -1,9 +1,11 @@
 {
+	"auto_upgrade_last_run": null,
 	"installed_packages":
 	[
 		"AdvancedNewFile",
 		"Emmet",
 		"Git",
+		"Hex to HSL Color Converter",
 		"jQuery",
 		"LESS",
 		"Markdown Preview",
