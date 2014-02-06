@@ -119,7 +119,7 @@ class SublimeFiles
   end
 
   def file_to_string(file_name)
-    if file_name != nil && File.exists?(file_name)
+    if file_name != nil && File.exist?(file_name)
       file = File.open(file_name)
       contents = file.read
       file.close
@@ -137,32 +137,32 @@ class SublimeFiles
 
 
   def do_that_voodoo
-    if !File.exists?(@onn_link_path)
+    if !File.exist?(@onn_link_path)
       # link basic path
       puts "Creating link #{@onn_link_path}"
       FileUtils.ln_s( @default_path, @onn_link_path, :verbose => true)
     end
 
-    if !File.exists?(@user_path)
+    if !File.exist?(@user_path)
       # move default sublime user directory as baseline
       puts "Moving Sublime user directory to repository and linking."
       FileUtils.mv(@user_link_path,@user_path, :verbose => true)
       FileUtils.ln_s(@user_path, @user_link_path, :verbose => true)
     end
-    if !File.exists?(@user_file) # check again now that we have moved files
+    if !File.exist?(@user_file) # check again now that we have moved files
       # copy default file as baseline
       puts "Creating #{@user_file}"
       FileUtils.cp(@output_file,@user_file, :verbose => true)
     end
     @user_contents = strip_str(file_to_string(@user_file),false)
 
-    if File.exists?(@default_file)
+    if File.exist?(@default_file)
       @default_contents = strip_str(file_to_string(@default_file),true)
     else
   	  raise "missing the repo file #{@default_file}"
     end
 
-    if File.exists?(@output_file)
+    if File.exist?(@output_file)
       @output_contents = file_to_string(@output_file)
     else
   	  raise "missing the output file #{@output_file}"
