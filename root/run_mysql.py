@@ -1,7 +1,7 @@
 import subprocess
 import sublime
 import sublime_plugin
-
+import time
 
 class RunMysqlCommand(sublime_plugin.TextCommand):
     SQLSTMT_STARTS = frozenset(['select', 'update', 'delete', 'insert', 'replace', 'use', 'load', 'describe', 'desc', 'explain', 'create', 'alter'])
@@ -51,7 +51,8 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
 
         view = self.get_output_view()
         edit = view.begin_edit()
-        view.insert(edit, view.size(), "\n" + output)
+        timestr = time.strftime("%Y-%m-%d %H:%M:%S ==> ", time.localtime())
+        view.insert(edit, view.size(), timestr + stmt + "\n" + output + "\n")
         view.end_edit(edit)
         view.show(view.size())
 
