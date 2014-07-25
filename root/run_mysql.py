@@ -68,6 +68,8 @@ class AsciiTableBuilder:
 
 
 class SaveView(sublime_plugin.EventListener):
+    default_schema = sublime.load_settings('onn.sublime-settings').get('default_schema')
+
     def __init__(self):
         self.view = None
         self.table_builder = AsciiTableBuilder()
@@ -78,7 +80,7 @@ class SaveView(sublime_plugin.EventListener):
 
         params = {}
         if database is None:
-            database = db_settings.get('default_schema')
+            database = SaveView.default_schema
 
         for connection in connections_list:
             if connection.get('name') == database:
@@ -108,6 +110,18 @@ class SaveView(sublime_plugin.EventListener):
     def on_close(self, view):
         if (not (self.view is None)) and (view.name() == self.view.name()):
             self.view = None
+
+class RunMysqlSwitchDefaultSchemaCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.connection_list = []
+        for connection in sublime.load_settings('onn.sublime-settings').get('connections'):
+            self.connection_list.append([connection.get('name'), 'Host: ' + connection.get('host')])
+        window = sublime.active_window()
+        window.show_quick_panel(self.connection_list, self.on_done)
+
+    def on_done(self, picked):
+        if picked >= 0:
+            SaveView.default_schema = self.connection_list[picked][0]
 
 class RunMysqlCommand(sublime_plugin.TextCommand):
     SQLSTMT_STARTS = frozenset(['select', 'update', 'delete', 'insert', 'replace', 'use', 'load', 'describe', 'desc', 'explain', 'create', 'alter'])
