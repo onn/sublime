@@ -79,6 +79,7 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         current_file = self.view.file_name()
+        self.current_file = current_file
         window = sublime.active_window()
 
         if current_file == None:
@@ -152,7 +153,13 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
     def get_output_view(self):
         if save_output_view.has_view():
             return save_output_view.get_view()
-        new_view = self.build_output_view()
+        new_view = None
+        for window in sublime.windows():
+            for check_view in window.views():
+                if check_view.settings().get('parent_file') == self.current_file:
+                    new_view = check_view
+        if new_view is None:
+            new_view = self.build_output_view()
         save_output_view.save_view(new_view)
         save_output_view.connect_to_database()
         return new_view
@@ -160,6 +167,7 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
     def build_output_view(self):
         window = sublime.active_window()
         view = window.new_file()
+        view.settings().set('parent_file', self.current_file)
         view.settings().set('word_wrap', True)
         view.set_name('output from %s' % (self.tab_name))
         view.settings().set("RunInScratch", True)
