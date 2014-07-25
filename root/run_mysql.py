@@ -1,11 +1,38 @@
+import sublime, sublime_plugin, sys, os
 import subprocess
-import sublime
-import sublime_plugin
 import time
+
+# weird stuff needed to get MySQLdb working
+directory = os.path.dirname(os.path.realpath(__file__)) + "\\"
+sys.path.append(directory+"\\MySQLdb")
+sys.path.append(directory+"\\MySQLdb\\constants")
+
+from MySQLdb import *
+from MySQLdb.constants import *
 
 class SaveView:
     def __init__(self):
         self.view = None
+
+    def connect_to_database(self, database=None):
+        db_settings = sublime.load_settings('onn.sublime-settings')
+        connections_list = db_settings.get('connections')
+
+        params = {}
+        if database is None:
+            database = db_settings.get('default_schema')
+
+        for connection in connections_list:
+            if connection.get('name') == database:
+                params = connection
+
+        self.db = connect(params.get('host'), params.get('user'), params.get('pass'), params.get('db'))
+        print("connected to database")
+
+    def query(self, query):
+        cursor = self.db.cursor()
+        cursor.execute(query)
+        return cursor.fetchall()
 
     def save_view(self, view):
         self.view = view
@@ -30,7 +57,7 @@ class ForgetViews(sublime_plugin.EventListener):
 class RunMysqlCommand(sublime_plugin.TextCommand):
     SQLSTMT_STARTS = frozenset(['select', 'update', 'delete', 'insert', 'replace', 'use', 'load', 'describe', 'desc', 'explain', 'create', 'alter'])
 
-    def send_sql(self, stmt):
+    def send_sql_by_pipe(self, stmt):
         cmd = '/usr/local/mysql/bin/mysql --login-path=devroot -t -e"' + stmt + '" lsfs_main'
         output = ''
         try:
@@ -43,6 +70,13 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         except OSError, excpt:
             output = str(excpt)
         return output
+
+    def send_sql_by_connection(self, stmt):
+        data = save_output_view.query(stmt)
+        return repr(data)
+
+    def send_sql(self, stmt):
+        return self.send_sql_by_connection(stmt)
 
     def run(self, edit):
         current_file = self.view.file_name()
@@ -66,12 +100,12 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         else:
             stmt = self.view.substr(region).strip()
 
+        view = self.get_output_view()
         if len(stmt) == 0:
             output = "unable to find statement"
         else:
             output = self.send_sql(stmt)
 
-        view = self.get_output_view()
         edit = view.begin_edit()
         timestr = time.strftime("%Y-%m-%d %H:%M:%S ==> ", time.localtime())
         view.insert(edit, view.size(), timestr + stmt + "\n" + output + "\n")
@@ -119,8 +153,9 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
     def get_output_view(self):
         if save_output_view.has_view():
             return save_output_view.get_view()
-        new_view = self.build_output_view();
+        new_view = self.build_output_view()
         save_output_view.save_view(new_view)
+        save_output_view.connect_to_database()
         return new_view
 
     def build_output_view(self):
