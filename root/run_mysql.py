@@ -14,10 +14,18 @@ class SaveView:
         return self.view
 
     def has_view(self):
-        return self.view is not None
+        return not (self.view is None)
+
+    def close_view(self, view):
+        if view.name() == self.view.name():
+            self.view = None
+
 
 save_output_view = SaveView()
 
+class ForgetViews(sublime_plugin.EventListener):
+    def on_close(self, view):
+        save_output_view.close_view(view)
 
 class RunMysqlCommand(sublime_plugin.TextCommand):
     SQLSTMT_STARTS = frozenset(['select', 'update', 'delete', 'insert', 'replace', 'use', 'load', 'describe', 'desc', 'explain', 'create', 'alter'])
