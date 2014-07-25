@@ -1,17 +1,11 @@
 {
-	"auto_upgrade_last_run": null,
 	"installed_packages":
 	[
 		"Git",
 		"Missing Palette Commands",
 		"Origami",
+		"OrigamiEmacs",
 		"Package Control",
-		"SideBarEnhancements",
-		"SideBarGit",
-		"SublimeLinter",
-		"SublimeREPL",
-		"SublimeTODO",
-		"SublimeXiki",
-		"Tag"
+		"SublimeLinter"
 	]
 }
