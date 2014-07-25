@@ -10,9 +10,67 @@ sys.path.append(directory+"\\MySQLdb\\constants")
 from MySQLdb import *
 from MySQLdb.constants import *
 
+class AsciiTableBuilder:
+    def determine_field_widths(self, rows, headers):
+        widths = []
+        for column_index in range(0, len(headers)):
+            max_width = len(headers[column_index])
+            for values in rows:
+                value_len = len(values[column_index])
+                if value_len > max_width:
+                    max_width = value_len
+            widths.append(max_width)
+        return widths
+
+    def build_separator(self, widths):
+        str = '+'
+        for col_width in widths:
+            str += ('-' * (col_width + 2)) + '+'
+        return str
+
+    def value_to_string(self, value):
+        if value is None:
+            return 'NULL'
+        return str(value)
+
+    def build_row(self, values, widths):
+        str = '|'
+        for column_index in range(0, len(widths)):
+            max_width = widths[column_index]
+            value_str = values[column_index]
+            value_str = values[column_index]
+            value_len = len(value_str)
+            pad_len = (max_width - value_len) + 1
+            str += (' ' * pad_len) + value_str + ' |'
+        return (str + "\n")
+
+    def convert_all_values_to_strings(self, old_rows):
+        new_rows = []
+        for old_values in old_rows:
+            new_values = []
+            for one_old in old_values:
+                new_values.append(self.value_to_string(one_old))
+            new_rows.append(new_values)
+        return new_rows
+
+    def run(self, rows, headers):
+        rows = self.convert_all_values_to_strings(rows)
+        widths = self.determine_field_widths(rows, headers)
+        separator = self.build_separator(widths) + "\n"
+        retval = ''
+        retval += separator
+        retval += self.build_row(headers, widths)
+        retval += separator
+        for values in rows:
+            retval += self.build_row(values, widths)
+        retval += separator
+        return retval
+
+
 class SaveView:
     def __init__(self):
         self.view = None
+        self.table_builder = AsciiTableBuilder()
 
     def connect_to_database(self, database=None):
         db_settings = sublime.load_settings('onn.sublime-settings')
@@ -31,7 +89,12 @@ class SaveView:
     def query(self, query):
         cursor = self.db.cursor()
         cursor.execute(query)
-        return cursor.fetchall()
+        data = cursor.fetchall()
+        headers = []
+        for header_detail in cursor.description:
+            headers.append(header_detail[0])
+        output = self.table_builder.run(data, headers)
+        return output
 
     def save_view(self, view):
         self.view = view
@@ -71,8 +134,7 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         return output
 
     def send_sql_by_connection(self, stmt):
-        data = save_output_view.query(stmt)
-        return repr(data)
+        return save_output_view.query(stmt)
 
     def send_sql(self, stmt):
         return self.send_sql_by_connection(stmt)
