@@ -17,7 +17,7 @@ class SaveView:
         return not (self.view is None)
 
     def close_view(self, view):
-        if view.name() == self.view.name():
+        if (not (self.view is None)) and (view.name() == self.view.name()):
             self.view = None
 
 
