@@ -3,6 +3,22 @@ import sublime
 import sublime_plugin
 import time
 
+class SaveView:
+    def __init__(self):
+        self.view = None
+
+    def save_view(self, view):
+        self.view = view
+
+    def get_view(self):
+        return self.view
+
+    def has_view(self):
+        return self.view is not None
+
+save_output_view = SaveView()
+
+
 class RunMysqlCommand(sublime_plugin.TextCommand):
     SQLSTMT_STARTS = frozenset(['select', 'update', 'delete', 'insert', 'replace', 'use', 'load', 'describe', 'desc', 'explain', 'create', 'alter'])
 
@@ -94,14 +110,12 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
 
         return self.view.substr(sublime.Region(begin_stmt, end_stmt)).strip()
 
-    # TODO: seems like we should be able to just store what the view is, rather than search for it every time
-    # but when I tried doing that before by storing it in self.output_view, it did not work
     def get_output_view(self):
-        for window in sublime.windows():
-            for view in window.views():
-                if view.settings().get('parent_file') == self.current_file:
-                    return view
-        return self.build_output_view()
+        if save_output_view.has_view():
+            return save_output_view.get_view()
+        new_view = self.build_output_view();
+        save_output_view.save_view(new_view)
+        return new_view
 
     def build_output_view(self):
         window = sublime.active_window()
