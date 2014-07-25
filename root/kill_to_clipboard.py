@@ -74,7 +74,7 @@ class YankFromClipboardCommand(sublime_plugin.TextCommand):
 
 class KillToClipboardEvents(sublime_plugin.EventListener):
     def on_activated(self, view):
-        print "kill_to_clipboard: locking in on_activated event"
+        # print "kill_to_clipboard: locking in on_activated event"
         kill_location.lock()
 
     def on_selection_modified(self, view):
