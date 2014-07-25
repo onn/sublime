@@ -205,6 +205,10 @@
     ]
   },
 
+  ////////////// MySQL
+  { "keys": ["ctrl+j","ctrl+p","ctrl+m"], "command": "run_mysql_switch_default_schema" },
+  { "keys": ["ctrl+j", "ctrl+m"], "command": "run_mysql"},
+
   ////////////// basic editing keybinds from Emacs
   { "keys": ["ctrl+h"], "command": "left_delete"},
   { "keys": ["ctrl+d"], "command": "right_delete"}
