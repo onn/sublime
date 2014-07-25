@@ -130,25 +130,8 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         super(RunMysqlCommand, self).__init__(view)
         self.save_output_view = SaveView()
 
-    def send_sql_by_pipe(self, stmt):
-        cmd = '/usr/local/mysql/bin/mysql --login-path=devroot -t -e"' + stmt + '" lsfs_main'
-        output = ''
-        try:
-            process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            result, error = process.communicate()
-            if error != '':
-                output = error
-            else:
-                output = str(result)
-        except OSError, excpt:
-            output = str(excpt)
-        return output
-
-    def send_sql_by_connection(self, stmt):
-        return self.save_output_view.query(stmt)
-
     def send_sql(self, stmt):
-        return self.send_sql_by_connection(stmt)
+        return self.save_output_view.query(stmt)
 
     def run(self, edit):
         current_file = self.view.file_name()
