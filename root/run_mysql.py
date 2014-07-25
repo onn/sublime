@@ -67,7 +67,7 @@ class AsciiTableBuilder:
         return retval
 
 
-class SaveView:
+class SaveView(sublime_plugin.EventListener):
     def __init__(self):
         self.view = None
         self.table_builder = AsciiTableBuilder()
@@ -105,19 +105,16 @@ class SaveView:
     def has_view(self):
         return not (self.view is None)
 
-    def close_view(self, view):
+    def on_close(self, view):
         if (not (self.view is None)) and (view.name() == self.view.name()):
             self.view = None
 
-
-save_output_view = SaveView()
-
-class ForgetViews(sublime_plugin.EventListener):
-    def on_close(self, view):
-        save_output_view.close_view(view)
-
 class RunMysqlCommand(sublime_plugin.TextCommand):
     SQLSTMT_STARTS = frozenset(['select', 'update', 'delete', 'insert', 'replace', 'use', 'load', 'describe', 'desc', 'explain', 'create', 'alter'])
+
+    def __init__(self, view):
+        super(RunMysqlCommand, self).__init__(view)
+        self.save_output_view = SaveView()
 
     def send_sql_by_pipe(self, stmt):
         cmd = '/usr/local/mysql/bin/mysql --login-path=devroot -t -e"' + stmt + '" lsfs_main'
@@ -134,7 +131,7 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         return output
 
     def send_sql_by_connection(self, stmt):
-        return save_output_view.query(stmt)
+        return self.save_output_view.query(stmt)
 
     def send_sql(self, stmt):
         return self.send_sql_by_connection(stmt)
@@ -213,8 +210,8 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         return self.view.substr(sublime.Region(begin_stmt, end_stmt)).strip()
 
     def get_output_view(self):
-        if save_output_view.has_view():
-            return save_output_view.get_view()
+        if self.save_output_view.has_view():
+            return self.save_output_view.get_view()
         new_view = None
         for window in sublime.windows():
             for check_view in window.views():
@@ -222,8 +219,8 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
                     new_view = check_view
         if new_view is None:
             new_view = self.build_output_view()
-        save_output_view.save_view(new_view)
-        save_output_view.connect_to_database()
+        self.save_output_view.save_view(new_view)
+        self.save_output_view.connect_to_database()
         return new_view
 
     def build_output_view(self):
