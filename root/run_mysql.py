@@ -26,7 +26,7 @@ class SaveView:
             if connection.get('name') == database:
                 params = connection
 
-        self.db = connect(params.get('host'), params.get('user'), params.get('pass'), params.get('db'))
+        self.db = connect(params.get('host'), params.get('user'), params.get('pass'), params.get('db'), params.get('port'))
 
     def query(self, query):
         cursor = self.db.cursor()
