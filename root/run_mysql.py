@@ -27,7 +27,6 @@ class SaveView:
                 params = connection
 
         self.db = connect(params.get('host'), params.get('user'), params.get('pass'), params.get('db'))
-        print("connected to database")
 
     def query(self, query):
         cursor = self.db.cursor()
