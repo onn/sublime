@@ -6,7 +6,8 @@
             "host": "localhost",
             "user": "username",
             "pass": "password",
-            "db"  : "database"
+            "db"  : "database",
+            "port": 3306
         }
     ],
     "default_schema": "Schema Name"
