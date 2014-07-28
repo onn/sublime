@@ -100,7 +100,13 @@ class SaveView(sublime_plugin.EventListener):
             headers = []
             for header_detail in cursor.description:
                 headers.append(header_detail[0])
+            row_count = len(data)
+            if row_count == 0:
+                return "no rows\n"
+
             output = self.table_builder.run(data, headers)
+            if row_count > 1:
+              output += str(row_count) + " rows"
         except Exception, excpt:
             return str(excpt) + "\n"
         return output
