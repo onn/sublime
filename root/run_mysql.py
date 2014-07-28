@@ -90,12 +90,18 @@ class SaveView(sublime_plugin.EventListener):
 
     def query(self, query):
         cursor = self.db.cursor()
-        cursor.execute(query)
-        data = cursor.fetchall()
-        headers = []
-        for header_detail in cursor.description:
-            headers.append(header_detail[0])
-        output = self.table_builder.run(data, headers)
+        try:
+            cursor.execute(query)
+            if cursor.description is None:
+                return str(cursor.rowcount) + ' rows affected\n'
+
+            data = cursor.fetchall()
+            headers = []
+            for header_detail in cursor.description:
+                headers.append(header_detail[0])
+            output = self.table_builder.run(data, headers)
+        except Exception, excpt:
+            return str(excpt)
         return output
 
     def save_view(self, view):
