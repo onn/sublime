@@ -115,7 +115,7 @@ class SaveView(sublime_plugin.EventListener):
         return not (self.view is None)
 
     def on_close(self, view):
-        if (not (self.view is None)) and (view.name() == self.view.name()):
+        if (not (self.view is None)) and (view.id() == self.view.id()):
             self.view = None
 
 class RunMysqlSwitchDefaultSchemaCommand(sublime_plugin.TextCommand):
