@@ -91,7 +91,10 @@ class SaveView(sublime_plugin.EventListener):
     def query(self, query):
         cursor = self.db.cursor()
         try:
+            start_time = time.time()
             cursor.execute(query)
+            elapsed_amt = round(time.time() - start_time, 2)
+            elapsed_str = str(elapsed_amt) + ' sec'
             if cursor.description is None:
                 if query.lower().find("use") == 0:
                     return 'database changed\n'
@@ -102,11 +105,10 @@ class SaveView(sublime_plugin.EventListener):
                 headers.append(header_detail[0])
             row_count = len(data)
             if row_count == 0:
-                return "no rows\n"
+                return "no rows" + elapsed_str + "\n"
 
             output = self.table_builder.run(data, headers)
-            if row_count > 1:
-              output += str(row_count) + " rows"
+            output += str(row_count) + " rows (" + elapsed_str + ")"
         except Exception, excpt:
             return str(excpt) + "\n"
         return output
