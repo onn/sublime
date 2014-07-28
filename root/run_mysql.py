@@ -124,7 +124,7 @@ class RunMysqlSwitchDefaultSchemaCommand(sublime_plugin.TextCommand):
             SaveView.default_schema = self.connection_list[picked][0]
 
 class RunMysqlCommand(sublime_plugin.TextCommand):
-    SQLSTMT_STARTS = frozenset(['select', 'update', 'delete', 'insert', 'replace', 'use', 'load', 'describe', 'desc', 'explain', 'create', 'alter'])
+    SQLSTMT_STARTS = frozenset(['select', 'update', 'delete', 'insert', 'replace', 'use', 'load', 'describe', 'desc', 'explain', 'create', 'alter', 'truncate'])
 
     def __init__(self, view):
         super(RunMysqlCommand, self).__init__(view)
