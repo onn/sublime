@@ -227,7 +227,7 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         new_view = None
         for window in sublime.windows():
             for check_view in window.views():
-                if check_view.settings().get('parent_file') == self.current_file:
+                if check_view.settings().get('run_mysql_source_file') == self.current_file:
                     new_view = check_view
         if new_view is None:
             new_view = self.build_output_view()
@@ -238,7 +238,7 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
     def build_output_view(self):
         window = sublime.active_window()
         view = window.new_file()
-        view.settings().set('parent_file', self.current_file)
+        view.settings().set('run_mysql_source_file', self.current_file)
         view.settings().set('word_wrap', True)
         view.set_name('output from %s' % (self.tab_name))
         view.settings().set("RunInScratch", True)
