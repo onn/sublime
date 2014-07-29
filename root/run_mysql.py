@@ -109,7 +109,7 @@ class SaveView(sublime_plugin.EventListener):
                 headers.append(header_detail[0])
             row_count = len(data)
             if row_count == 0:
-                return "no rows" + elapsed_str + "\n"
+                return "no rows (" + elapsed_str + ")\n"
 
             output = self.table_builder.run(data, headers)
             output += str(row_count) + " rows (" + elapsed_str + ")\n"
