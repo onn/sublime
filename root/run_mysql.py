@@ -74,7 +74,10 @@ class SaveView(sublime_plugin.EventListener):
         self.view = None
         self.table_builder = AsciiTableBuilder()
 
-    def connect_to_database(self, database=None):
+    def build_output_view_name(self, source_tab):
+        return '%s: %s' % (self.default_schema, source_tab)
+
+    def connect_to_database(self, source_tab, database=None):
         db_settings = sublime.load_settings('onn.sublime-settings')
         connections_list = db_settings.get('connections')
 
@@ -87,6 +90,7 @@ class SaveView(sublime_plugin.EventListener):
                 params = connection
 
         self.db = connect(params.get('host'), params.get('user'), params.get('pass'), params.get('db'), params.get('port'))
+        self.view.set_name(self.build_output_view_name(source_tab))
 
     def query(self, query):
         cursor = self.db.cursor()
@@ -232,18 +236,14 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         if new_view is None:
             new_view = self.build_output_view()
         self.save_output_view.save_view(new_view)
-        self.save_output_view.connect_to_database()
+        self.save_output_view.connect_to_database(self.tab_name)
         return new_view
-
-    def build_output_view_name(self):
-        return 'output from %s' % (self.tab_name)
 
     def build_output_view(self):
         window = sublime.active_window()
         view = window.new_file()
         view.settings().set('run_mysql_source_file', self.current_file)
         view.settings().set('word_wrap', True)
-        view.set_name(self.build_output_view_name())
         view.settings().set("RunInScratch", True)
         view.set_scratch(True)
         return view
