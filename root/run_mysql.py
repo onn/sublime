@@ -171,17 +171,17 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         else:
             stmt = self.view.substr(region).strip()
 
-        view = self.get_output_view()
+        output_view = self.get_output_view()
         if len(stmt) == 0:
             output = "unable to find statement"
         else:
             output = self.send_sql(stmt)
 
-        edit = view.begin_edit()
+        edit = output_view.begin_edit()
         timestr = time.strftime("%Y-%m-%d %H:%M:%S ==> ", time.localtime())
-        view.insert(edit, view.size(), timestr + stmt + "\n" + output + "\n")
-        view.end_edit(edit)
-        view.show(view.size())
+        output_view.insert(edit, output_view.size(), timestr + stmt + "\n" + output + "\n")
+        output_view.end_edit(edit)
+        output_view.show(output_view.size())
 
     def has_sqlstmt_start(self, line):
         if len(line) == 0:
