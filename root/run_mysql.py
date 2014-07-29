@@ -235,12 +235,15 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         self.save_output_view.connect_to_database()
         return new_view
 
+    def build_output_view_name(self):
+        return 'output from %s' % (self.tab_name)
+
     def build_output_view(self):
         window = sublime.active_window()
         view = window.new_file()
         view.settings().set('run_mysql_source_file', self.current_file)
         view.settings().set('word_wrap', True)
-        view.set_name('output from %s' % (self.tab_name))
+        view.set_name(self.build_output_view_name())
         view.settings().set("RunInScratch", True)
         view.set_scratch(True)
         return view
