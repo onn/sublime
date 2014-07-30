@@ -78,13 +78,12 @@ class SaveView(sublime_plugin.EventListener):
     def build_output_view_name(self):
         return 'mysql (%s): %s' % (self.default_schema, self.source_tab)
 
-    def connect_to_database(self, database=None):
-        db_settings = sublime.load_settings('onn.sublime-settings')
-        connections_list = db_settings.get('connections')
+    def connect_to_database(self):
+        onn_settings = sublime.load_settings('onn.sublime-settings')
+        connections_list = onn_settings.get('connections')
 
         params = {}
-        if database is None:
-            database = SaveView.default_schema
+        database = SaveView.default_schema
 
         for connection in connections_list:
             if connection.get('name') == database:
