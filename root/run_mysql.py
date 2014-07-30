@@ -75,7 +75,7 @@ class SaveView(sublime_plugin.EventListener):
         self.table_builder = AsciiTableBuilder()
 
     def build_output_view_name(self, source_tab):
-        return '%s: %s' % (self.default_schema, source_tab)
+        return 'mysql (%s): %s' % (self.default_schema, source_tab)
 
     def connect_to_database(self, source_tab, database=None):
         db_settings = sublime.load_settings('onn.sublime-settings')
