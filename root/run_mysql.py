@@ -72,12 +72,13 @@ class SaveView(sublime_plugin.EventListener):
 
     def __init__(self):
         self.view = None
+        self.source_tab = None
         self.table_builder = AsciiTableBuilder()
 
-    def build_output_view_name(self, source_tab):
-        return 'mysql (%s): %s' % (self.default_schema, source_tab)
+    def build_output_view_name(self):
+        return 'mysql (%s): %s' % (self.default_schema, self.source_tab)
 
-    def connect_to_database(self, source_tab, database=None):
+    def connect_to_database(self, database=None):
         db_settings = sublime.load_settings('onn.sublime-settings')
         connections_list = db_settings.get('connections')
 
@@ -90,7 +91,7 @@ class SaveView(sublime_plugin.EventListener):
                 params = connection
 
         self.db = connect(params.get('host'), params.get('user'), params.get('pass'), params.get('db'), params.get('port'))
-        self.view.set_name(self.build_output_view_name(source_tab))
+        self.view.set_name(self.build_output_view_name())
 
     def query(self, query):
         cursor = self.db.cursor()
@@ -120,8 +121,9 @@ class SaveView(sublime_plugin.EventListener):
             return str(excpt) + "\n"
         return output
 
-    def save_view(self, view):
+    def save_view(self, view, source_tab):
         self.view = view
+        self.source_tab = source_tab
 
     def get_view(self):
         return self.view
@@ -238,8 +240,8 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
                     new_view = check_view
         if new_view is None:
             new_view = self.build_output_view()
-        self.save_output_view.save_view(new_view)
-        self.save_output_view.connect_to_database(self.tab_name)
+        self.save_output_view.save_view(new_view, self.tab_name)
+        self.save_output_view.connect_to_database()
         return new_view
 
     def build_output_view(self):
