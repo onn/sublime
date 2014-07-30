@@ -9,6 +9,5 @@
             "db"  : "database",
             "port": 3306
         }
-    ],
-    "default_schema": "Schema Name"
+    ]
 }

@@ -68,22 +68,34 @@ class AsciiTableBuilder:
 
 
 class SaveView(sublime_plugin.EventListener):
-    default_schema = sublime.load_settings('onn.sublime-settings').get('default_schema')
-
     def __init__(self):
         self.view = None
         self.source_tab = None
         self.table_builder = AsciiTableBuilder()
+        self.selected_database = None
 
     def build_output_view_name(self):
-        return 'mysql (%s): %s' % (self.default_schema, self.source_tab)
+        return 'mysql (%s): %s' % (self.selected_database, self.source_tab)
 
-    def connect_to_database(self):
+    def pick_database(self):
+        self.ui_connection_list = []
+        for connection in sublime.load_settings('onn.sublime-settings').get('connections'):
+            self.ui_connection_list.append([connection.get('name'), 'Host: ' + connection.get('host')])
+        window = sublime.active_window()
+        window.show_quick_panel(self.ui_connection_list, self.connect_to_database)
+
+    def connect_to_database(self, picked):
+        if picked < 0:
+            self.selected_database = None
+            print "nothing picked, not connecting to the database"
+            return
+
         onn_settings = sublime.load_settings('onn.sublime-settings')
         connections_list = onn_settings.get('connections')
 
         params = {}
-        database = SaveView.default_schema
+        database = self.ui_connection_list[picked][0]
+        self.selected_database = database
 
         for connection in connections_list:
             if connection.get('name') == database:
@@ -133,18 +145,6 @@ class SaveView(sublime_plugin.EventListener):
     def on_close(self, view):
         if (not (self.view is None)) and (view.id() == self.view.id()):
             self.view = None
-
-class RunMysqlSwitchDefaultSchemaCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        self.connection_list = []
-        for connection in sublime.load_settings('onn.sublime-settings').get('connections'):
-            self.connection_list.append([connection.get('name'), 'Host: ' + connection.get('host')])
-        window = sublime.active_window()
-        window.show_quick_panel(self.connection_list, self.on_done)
-
-    def on_done(self, picked):
-        if picked >= 0:
-            SaveView.default_schema = self.connection_list[picked][0]
 
 class RunMysqlCommand(sublime_plugin.TextCommand):
     SQLSTMT_STARTS = frozenset(['select', 'update', 'delete', 'insert', 'replace', 'use', 'load', 'describe', 'desc', 'explain', 'create', 'alter', 'truncate'])
@@ -240,7 +240,7 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         if new_view is None:
             new_view = self.build_output_view()
         self.save_output_view.save_view(new_view, self.tab_name)
-        self.save_output_view.connect_to_database()
+        self.save_output_view.pick_database()
         return new_view
 
     def build_output_view(self):
