@@ -102,7 +102,10 @@ class SaveView(sublime_plugin.EventListener):
             if cursor.description is None:
                 if query.lower().find("use") == 0:
                     return 'database changed\n'
-                return str(cursor.rowcount) + ' rows affected\n'
+                insert_id = cursor.lastrowid
+                if insert_id > 0:
+                    return 'last insert id: ' + str(insert_id) + ' (' + elapsed_str + ')\n';
+                return str(cursor.rowcount) + ' rows affected (' + elapsed_str + ')\n'
             data = cursor.fetchall()
             headers = []
             for header_detail in cursor.description:
