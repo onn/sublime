@@ -102,6 +102,7 @@ class SaveView(sublime_plugin.EventListener):
                 params = connection
 
         self.db = connect(params.get('host'), params.get('user'), params.get('pass'), params.get('db'), params.get('port'))
+        self.query('SET autocommit=1');
         self.view.set_name(self.build_output_view_name())
 
     def query(self, query):
