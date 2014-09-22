@@ -147,7 +147,7 @@ class SaveView(sublime_plugin.EventListener):
             self.view = None
 
 class RunMysqlCommand(sublime_plugin.TextCommand):
-    SQLSTMT_STARTS = frozenset(['select', 'update', 'delete', 'insert', 'replace', 'use', 'load', 'describe', 'desc', 'explain', 'create', 'alter', 'truncate'])
+    SQLSTMT_STARTS = frozenset(['select', 'update', 'delete', 'insert', 'replace', 'use', 'load', 'describe', 'desc', 'explain', 'create', 'alter', 'truncate', 'show', 'commit', 'set'])
 
     def __init__(self, view):
         super(RunMysqlCommand, self).__init__(view)
