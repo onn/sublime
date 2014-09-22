@@ -104,9 +104,12 @@ class SaveView(sublime_plugin.EventListener):
     def build_output_view_name(self):
         return 'mysql (%s): %s' % (self.selected_database, self.source_tab)
 
-    def output_text(self, text):
+    def output_text(self, include_timestamp, text):
         edit = self.view.begin_edit()
-        timestr = time.strftime("%Y-%m-%d %H:%M:%S ==> ", time.localtime())
+        if include_timestamp:
+            timestr = time.strftime("%Y-%m-%d %H:%M:%S ==> ", time.localtime())
+        else:
+            timestr = ""
         self.view.insert(edit, self.view.size(), timestr + text + "\n")
         self.view.end_edit(edit)
         self.view.show(self.view.size())
@@ -134,7 +137,7 @@ class SaveView(sublime_plugin.EventListener):
             if connection.get('name') == database:
                 params = connection
 
-        self.output_text("connecting to %s on %s:%s as %s" % (params.get('db'), params.get('host'), params.get('port'), params.get('user')))
+        self.output_text(True, "connecting to %s on %s:%s as %s" % (params.get('db'), params.get('host'), params.get('port'), params.get('user')))
         self.db = connect(params.get('host'), params.get('user'), params.get('pass'), params.get('db'), params.get('port'))
         self.db.cursor().execute('SET autocommit=1')
         self.view.set_name(self.build_output_view_name())
@@ -172,7 +175,7 @@ class SaveView(sublime_plugin.EventListener):
 
     def output_query(self, stmt):
         output = self.query(stmt)
-        self.output_text(stmt + "\n" + output)
+        self.output_text(True, stmt + "\n" + output)
 
     def save_view(self, view, source_tab):
         self.view = view
@@ -230,7 +233,7 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
             return
 
         if len(stmt) == 0:
-            self.save_output_view.output_text(stmt + "\nunable to find statement")
+            self.save_output_view.output_text(True, stmt + "\nunable to find statement")
             return
 
         self.save_output_view.output_query(stmt)
