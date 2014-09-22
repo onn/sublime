@@ -137,7 +137,7 @@ class QueryRunnerThread(threading.Thread):
         sublime.set_timeout(lambda: self.on_complete(False, output), 1)
 
 
-class SaveView(sublime_plugin.EventListener):
+class SaveView:
     def __init__(self):
         self.view = None
         self.source_tab = None
@@ -200,18 +200,18 @@ class SaveView(sublime_plugin.EventListener):
     def has_view(self):
         return not (self.view is None)
 
-    def on_close(self, view):
-        if (not (self.view is None)) and (view.id() == self.view.id()):
-            self.view = None
 
 class RunMysqlCommand(sublime_plugin.TextCommand):
     SQLSTMT_STARTS = frozenset(['select', 'update', 'delete', 'insert', 'replace', 'use', 'load', 'describe', 'desc', 'explain', 'create', 'alter', 'truncate', 'show', 'commit', 'set'])
 
     def __init__(self, view):
         super(RunMysqlCommand, self).__init__(view)
-        self.save_output_view = SaveView()
+        self.save_output_view = None
 
     def run(self, edit):
+        if self.save_output_view == None:
+            self.save_output_view = SaveView()
+
         if self.view.settings().get('run_mysql_source_file') != None:
             edit = self.view.begin_edit()
             self.view.insert(edit, self.view.size(), "unable to run queries from an output view (for now)" + "\n")
