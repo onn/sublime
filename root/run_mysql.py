@@ -29,8 +29,6 @@ class AsciiTableBuilder:
             if curr_header_size > max_header_size:
                 max_header_size = curr_header_size
 
-        print "max_header_size == " + str(max_header_size)
-
         padded = []
         for curr_header in headers:
             needed = max_header_size - len(curr_header)
@@ -123,7 +121,6 @@ class SaveView(sublime_plugin.EventListener):
     def connect_to_database(self, picked):
         if picked < 0:
             self.selected_database = None
-            print "nothing picked, not connecting to the database"
             return
 
         onn_settings = sublime.load_settings('onn.sublime-settings')
