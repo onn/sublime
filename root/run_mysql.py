@@ -156,7 +156,10 @@ class SaveView(sublime_plugin.EventListener):
             if row_count == 0:
                 return "no rows (" + elapsed_str + ")\n"
 
-            output = self.table_builder.build_line_per_row(data, headers)
+            if query[-2] == ';':
+                output = self.table_builder.build_line_per_field(data, headers)
+            else:
+                output = self.table_builder.build_line_per_row(data, headers)
             output += str(row_count) + " rows (" + elapsed_str + ")\n"
         except Exception, excpt:
             return str(excpt) + "\n"
