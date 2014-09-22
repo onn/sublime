@@ -175,7 +175,8 @@ class SaveView(sublime_plugin.EventListener):
 
     def output_query(self, stmt):
         output = self.query(stmt)
-        self.output_text(True, stmt + "\n" + output)
+        self.output_text(True, stmt)
+        self.output_text(False, output)
 
     def save_view(self, view, source_tab):
         self.view = view
