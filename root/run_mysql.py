@@ -106,6 +106,13 @@ class SaveView(sublime_plugin.EventListener):
     def build_output_view_name(self):
         return 'mysql (%s): %s' % (self.selected_database, self.source_tab)
 
+    def output_text(self, text):
+        edit = self.view.begin_edit()
+        timestr = time.strftime("%Y-%m-%d %H:%M:%S ==> ", time.localtime())
+        self.view.insert(edit, self.view.size(), timestr + text + "\n")
+        self.view.end_edit(edit)
+        self.view.show(self.view.size())
+
     def pick_database(self):
         self.ui_connection_list = []
         for connection in sublime.load_settings('onn.sublime-settings').get('connections'):
@@ -130,6 +137,7 @@ class SaveView(sublime_plugin.EventListener):
             if connection.get('name') == database:
                 params = connection
 
+        self.output_text("connecting to %s on %s:%s as %s" % (params.get('db'), params.get('host'), params.get('port'), params.get('user')))
         self.db = connect(params.get('host'), params.get('user'), params.get('pass'), params.get('db'), params.get('port'))
         self.query('SET autocommit=1')
         self.view.set_name(self.build_output_view_name())
@@ -220,12 +228,7 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
             output = "unable to find statement"
         else:
             output = self.send_sql(stmt)
-
-        edit = output_view.begin_edit()
-        timestr = time.strftime("%Y-%m-%d %H:%M:%S ==> ", time.localtime())
-        output_view.insert(edit, output_view.size(), timestr + stmt + "\n" + output + "\n")
-        output_view.end_edit(edit)
-        output_view.show(output_view.size())
+        self.save_output_view.output_text(stmt + "\n" + output)
 
     def has_sqlstmt_start(self, line):
         if len(line) == 0:
