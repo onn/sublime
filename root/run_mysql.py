@@ -22,6 +22,22 @@ class AsciiTableBuilder:
             widths.append(max_width)
         return widths
 
+    def build_padded_headers(self, headers):
+        max_header_size = 0
+        for curr_header in headers:
+            curr_header_size = len(curr_header)
+            if curr_header_size > max_header_size:
+                max_header_size = curr_header_size
+
+        print "max_header_size == " + str(max_header_size)
+
+        padded = []
+        for curr_header in headers:
+            needed = max_header_size - len(curr_header)
+            spaces = ' ' * needed
+            padded.append(spaces + curr_header)
+        return padded
+
     def build_separator(self, widths):
         str = '+'
         for col_width in widths:
@@ -33,7 +49,7 @@ class AsciiTableBuilder:
             return 'NULL'
         return str(value)
 
-    def build_row(self, values, widths):
+    def row_to_line(self, values, widths):
         str = '|'
         for column_index in range(0, len(widths)):
             max_width = widths[column_index]
@@ -53,19 +69,32 @@ class AsciiTableBuilder:
             new_rows.append(new_values)
         return new_rows
 
-    def run(self, rows, headers):
+    def build_line_per_row(self, rows, headers):
         rows = self.convert_all_values_to_strings(rows)
         widths = self.determine_field_widths(rows, headers)
         separator = self.build_separator(widths) + "\n"
         retval = ''
         retval += separator
-        retval += self.build_row(headers, widths)
+        retval += self.row_to_line(headers, widths)
         retval += separator
         for values in rows:
-            retval += self.build_row(values, widths)
+            retval += self.row_to_line(values, widths)
         retval += separator
         return retval
 
+    def build_line_per_field(self, rows, headers):
+        rows = self.convert_all_values_to_strings(rows)
+        padded_headers = self.build_padded_headers(headers)
+        field_count = len(padded_headers)
+        separator = ('*' * 25)
+        retval = ''
+        row_number = 0
+        for values in rows:
+            row_number += 1
+            retval += separator + ' row ' + str(row_number) + ' ' + separator + "\n"
+            for column_index in range(0, field_count):
+                retval += padded_headers[column_index] + ": " + values[column_index] + "\n"
+        return retval
 
 class SaveView(sublime_plugin.EventListener):
     def __init__(self):
@@ -117,7 +146,7 @@ class SaveView(sublime_plugin.EventListener):
                     return 'database changed\n'
                 insert_id = cursor.lastrowid
                 if insert_id > 0:
-                    return 'last insert id: ' + str(insert_id) + ' (' + elapsed_str + ')\n';
+                    return 'last insert id: ' + str(insert_id) + ' (' + elapsed_str + ')\n'
                 return str(cursor.rowcount) + ' rows affected (' + elapsed_str + ')\n'
             data = cursor.fetchall()
             headers = []
@@ -127,7 +156,7 @@ class SaveView(sublime_plugin.EventListener):
             if row_count == 0:
                 return "no rows (" + elapsed_str + ")\n"
 
-            output = self.table_builder.run(data, headers)
+            output = self.table_builder.build_line_per_row(data, headers)
             output += str(row_count) + " rows (" + elapsed_str + ")\n"
         except Exception, excpt:
             return str(excpt) + "\n"
