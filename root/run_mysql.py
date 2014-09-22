@@ -107,6 +107,7 @@ class QueryRunnerThread(threading.Thread):
     def run(self):
         cursor = self.dbconn.cursor()
         output = ""
+        error = None
         try:
             start_time = time.time()
             cursor.execute(self.stmt)
@@ -133,11 +134,14 @@ class QueryRunnerThread(threading.Thread):
                 output = self.table_builder.build_line_per_row(data, headers)
             output += str(row_count) + " rows (" + elapsed_str + ")\n"
         except Exception, excpt:
+            error = excpt
             output = str(excpt) + "\n"
-        sublime.set_timeout(lambda: self.on_complete(False, output), 1)
+        sublime.set_timeout(lambda: self.on_complete(error, output), 1)
 
 
 class SaveView:
+    RECONNECT_MYSQL_ERRORS = frozenset([2006])
+
     def __init__(self):
         self.view = None
         self.source_tab = None
@@ -187,8 +191,17 @@ class SaveView:
 
     def start_query(self, stmt):
         self.output_text(True, stmt)
-        thread = QueryRunnerThread(self.db, stmt, self.table_builder, self.output_text)
+        thread = QueryRunnerThread(self.db, stmt, self.table_builder, self.query_completed)
         thread.start()
+
+    def query_completed(self, excpt, text):
+        self.output_text(False, text)
+        if excpt == None:
+            return
+        error_code = excpt.args[0]
+
+        # if error_code in self.RECONNECT_MYSQL_ERRORS:
+        #     self.db = None
 
     def save_view(self, view, source_tab):
         self.view = view
