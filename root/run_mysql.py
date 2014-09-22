@@ -196,7 +196,10 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
             return False
         if line[0].isspace():
             return False
-        first_word = line.partition(' ')[0].lower()
+        search_line = line.lower();
+        if search_line == 'commit;':
+            return True
+        first_word = search_line.partition(' ')[0];
         return first_word in self.SQLSTMT_STARTS
 
     def find_statement(self, cursor):
