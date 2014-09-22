@@ -102,7 +102,7 @@ class SaveView(sublime_plugin.EventListener):
                 params = connection
 
         self.db = connect(params.get('host'), params.get('user'), params.get('pass'), params.get('db'), params.get('port'))
-        self.query('SET autocommit=1');
+        self.query('SET autocommit=1')
         self.view.set_name(self.build_output_view_name())
 
     def query(self, query):
@@ -200,10 +200,10 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
             return False
         if line[0].isspace():
             return False
-        search_line = line.lower();
+        search_line = line.lower()
         if search_line == 'commit;':
             return True
-        first_word = search_line.partition(' ')[0];
+        first_word = search_line.partition(' ')[0]
         return first_word in self.SQLSTMT_STARTS
 
     def find_statement(self, cursor):
