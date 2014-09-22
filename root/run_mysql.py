@@ -181,6 +181,9 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
             stmt = self.view.substr(region).strip()
 
         output_view = self.get_output_view()
+        if output_view == None:
+            return
+
         if len(stmt) == 0:
             output = "unable to find statement"
         else:
@@ -245,7 +248,8 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
             new_view = self.build_output_view()
         self.save_output_view.save_view(new_view, self.tab_name)
         self.save_output_view.pick_database()
-        return new_view
+        # if we have to pick a new database, return None for now
+        return None
 
     def build_output_view(self):
         window = sublime.active_window()
