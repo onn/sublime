@@ -170,6 +170,10 @@ class SaveView(sublime_plugin.EventListener):
             return str(excpt) + "\n"
         return output
 
+    def output_query(self, stmt):
+        output = self.query(stmt)
+        self.output_text(stmt + "\n" + output)
+
     def save_view(self, view, source_tab):
         self.view = view
         self.source_tab = source_tab
@@ -190,9 +194,6 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
     def __init__(self, view):
         super(RunMysqlCommand, self).__init__(view)
         self.save_output_view = SaveView()
-
-    def send_sql(self, stmt):
-        return self.save_output_view.query(stmt)
 
     def run(self, edit):
         if self.view.settings().get('run_mysql_source_file') != None:
@@ -229,10 +230,10 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
             return
 
         if len(stmt) == 0:
-            output = "unable to find statement"
-        else:
-            output = self.send_sql(stmt)
-        self.save_output_view.output_text(stmt + "\n" + output)
+            self.save_output_view.output_text(stmt + "\nunable to find statement")
+            return
+
+        self.save_output_view.output_query(stmt)
 
     def has_sqlstmt_start(self, line):
         if len(line) == 0:
