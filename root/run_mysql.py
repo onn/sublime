@@ -195,6 +195,13 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         return self.save_output_view.query(stmt)
 
     def run(self, edit):
+        if self.view.settings().get('run_mysql_source_file') != None:
+            edit = self.view.begin_edit()
+            self.view.insert(edit, self.view.size(), "unable to run queries from an output view (for now)" + "\n")
+            self.view.end_edit(edit)
+            self.view.show(self.view.size())
+            return
+
         current_file = self.view.file_name()
         self.current_file = current_file
         window = sublime.active_window()
