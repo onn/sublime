@@ -136,7 +136,7 @@ class SaveView(sublime_plugin.EventListener):
 
         self.output_text("connecting to %s on %s:%s as %s" % (params.get('db'), params.get('host'), params.get('port'), params.get('user')))
         self.db = connect(params.get('host'), params.get('user'), params.get('pass'), params.get('db'), params.get('port'))
-        self.query('SET autocommit=1')
+        self.db.cursor().execute('SET autocommit=1')
         self.view.set_name(self.build_output_view_name())
 
     def query(self, query):
