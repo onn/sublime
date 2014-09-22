@@ -198,7 +198,7 @@ class SaveView:
         return self.view
 
     def has_view(self):
-        return not (self.view is None)
+        return (not (self.view is None)) and (not (self.view.window() is None))
 
 
 class RunMysqlCommand(sublime_plugin.TextCommand):
