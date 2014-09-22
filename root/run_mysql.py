@@ -1,6 +1,7 @@
 import sublime, sublime_plugin, sys, os
 import subprocess
 import time
+import threading
 
 # weird stuff needed to get MySQLdb working
 directory = os.path.dirname(os.path.realpath(__file__)) + "\\"
@@ -94,6 +95,48 @@ class AsciiTableBuilder:
                 retval += padded_headers[column_index] + ": " + values[column_index] + "\n"
         return retval
 
+
+class QueryRunnerThread(threading.Thread):
+    def __init__(self, dbconn, stmt, table_builder, on_complete):
+        self.dbconn = dbconn
+        self.stmt = stmt
+        self.table_builder = table_builder
+        self.on_complete = on_complete
+        threading.Thread.__init__(self)
+
+    def run(self):
+        cursor = self.dbconn.cursor()
+        output = ""
+        try:
+            start_time = time.time()
+            cursor.execute(self.stmt)
+            elapsed_amt = round(time.time() - start_time, 2)
+            elapsed_str = str(elapsed_amt) + ' sec'
+            if cursor.description is None:
+                if self.stmt.lower().find("use") == 0:
+                    return 'database changed\n'
+                insert_id = cursor.lastrowid
+                if insert_id > 0:
+                    return 'last insert id: ' + str(insert_id) + ' (' + elapsed_str + ')\n'
+                return str(cursor.rowcount) + ' rows affected (' + elapsed_str + ')\n'
+            data = cursor.fetchall()
+            headers = []
+            for header_detail in cursor.description:
+                headers.append(header_detail[0])
+            row_count = len(data)
+            if row_count == 0:
+                return "no rows (" + elapsed_str + ")\n"
+
+            if self.stmt[-2] == ';':
+                output = self.table_builder.build_line_per_field(data, headers)
+            else:
+                output = self.table_builder.build_line_per_row(data, headers)
+            output += str(row_count) + " rows (" + elapsed_str + ")\n"
+        except Exception, excpt:
+            output = str(excpt) + "\n"
+        sublime.set_timeout(lambda: self.on_complete(False, output), 1)
+
+
 class SaveView(sublime_plugin.EventListener):
     def __init__(self):
         self.view = None
@@ -142,41 +185,10 @@ class SaveView(sublime_plugin.EventListener):
         self.db.cursor().execute('SET autocommit=1')
         self.view.set_name(self.build_output_view_name())
 
-    def query(self, query):
-        cursor = self.db.cursor()
-        try:
-            start_time = time.time()
-            cursor.execute(query)
-            elapsed_amt = round(time.time() - start_time, 2)
-            elapsed_str = str(elapsed_amt) + ' sec'
-            if cursor.description is None:
-                if query.lower().find("use") == 0:
-                    return 'database changed\n'
-                insert_id = cursor.lastrowid
-                if insert_id > 0:
-                    return 'last insert id: ' + str(insert_id) + ' (' + elapsed_str + ')\n'
-                return str(cursor.rowcount) + ' rows affected (' + elapsed_str + ')\n'
-            data = cursor.fetchall()
-            headers = []
-            for header_detail in cursor.description:
-                headers.append(header_detail[0])
-            row_count = len(data)
-            if row_count == 0:
-                return "no rows (" + elapsed_str + ")\n"
-
-            if query[-2] == ';':
-                output = self.table_builder.build_line_per_field(data, headers)
-            else:
-                output = self.table_builder.build_line_per_row(data, headers)
-            output += str(row_count) + " rows (" + elapsed_str + ")\n"
-        except Exception, excpt:
-            return str(excpt) + "\n"
-        return output
-
-    def output_query(self, stmt):
-        output = self.query(stmt)
+    def start_query(self, stmt):
         self.output_text(True, stmt)
-        self.output_text(False, output)
+        thread = QueryRunnerThread(self.db, stmt, self.table_builder, self.output_text)
+        thread.start()
 
     def save_view(self, view, source_tab):
         self.view = view
@@ -237,7 +249,7 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
             self.save_output_view.output_text(True, stmt + "\nunable to find statement")
             return
 
-        self.save_output_view.output_query(stmt)
+        self.save_output_view.start_query(stmt)
 
     def has_sqlstmt_start(self, line):
         if len(line) == 0:
