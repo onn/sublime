@@ -97,19 +97,35 @@ class AsciiTableBuilder:
 
 
 class QueryRunnerThread(threading.Thread):
-    def __init__(self, save_view, stmt, table_builder, on_complete):
+    RECONNECT_MYSQL_ERRORS = frozenset([2006, 2013])
+
+    def __init__(self, save_view, stmt, table_builder):
         self.save_view = save_view
         self.stmt = stmt
         self.table_builder = table_builder
-        self.on_complete = on_complete
         threading.Thread.__init__(self)
 
     def run(self):
         dbconn = self.save_view.get_dbconn()
         if dbconn == None:
-            self.on_complete(None, "unable to connect to database")
+            sublime.set_timeout(lambda: self.on_complete(None, "unable to connect to database"), 1)
             return
 
+        error_code = 0
+        error, output = self.run_query_once(dbconn)
+        if error != None:
+            error_code = error.args[0]
+        sublime.set_timeout(lambda: self.save_view.output_text(False, output), 1)
+
+        if not (error_code in self.RECONNECT_MYSQL_ERRORS):
+            return
+
+        dbconn = self.save_view.connect_to_database()
+        sublime.set_timeout(lambda: self.save_view.output_text(True, self.stmt), 1)
+        error, output = self.run_query_once(dbconn)
+        sublime.set_timeout(lambda: self.save_view.output_text(False, output), 1)
+
+    def run_query_once(self, dbconn):
         cursor = dbconn.cursor()
         output = ""
         error = None
@@ -141,12 +157,10 @@ class QueryRunnerThread(threading.Thread):
         except Exception, excpt:
             error = excpt
             output = str(excpt) + "\n"
-        sublime.set_timeout(lambda: self.on_complete(error, output), 1)
+        return (error, output)
 
 
 class SaveView:
-    RECONNECT_MYSQL_ERRORS = frozenset([2006, 2013])
-
     def __init__(self):
         self.view = None
         self.source_tab = None
@@ -198,19 +212,12 @@ class SaveView:
         self.dbconn = connect(vals.get('host'), vals.get('user'), vals.get('pass'), vals.get('db'), vals.get('port'))
         self.dbconn.cursor().execute('SET autocommit=1')
         sublime.set_timeout(lambda: self.view.set_name(self.build_output_view_name()), 1)
+        return self.dbconn
 
     def start_query(self, stmt):
         self.output_text(True, stmt)
-        thread = QueryRunnerThread(self, stmt, self.table_builder, self.query_completed)
+        thread = QueryRunnerThread(self, stmt, self.table_builder)
         thread.start()
-
-    def query_completed(self, excpt, text):
-        self.output_text(False, text)
-        if excpt == None:
-            return
-        error_code = excpt.args[0]
-        if error_code in self.RECONNECT_MYSQL_ERRORS:
-            self.dbconn = None
 
     def save_view(self, view, source_tab):
         self.view = view
