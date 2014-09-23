@@ -130,11 +130,12 @@ class QueryRunnerThread(threading.Thread):
             return
 
         dbconn = self.save_view.connect_to_database()
-        sublime.set_timeout(lambda: self.save_view.output_text(True, self.stmt), 1)
         error, output = self.run_query_once(dbconn)
         sublime.set_timeout(lambda: self.save_view.output_text(False, output), 1)
 
     def run_query_once(self, dbconn):
+        sublime.set_timeout(lambda: self.save_view.output_text(True, self.stmt), 1)
+
         cursor = dbconn.cursor()
         output = ""
         error = None
@@ -177,6 +178,7 @@ class SaveView:
         self.selected_database = None
         self.conn_params = None
         self.dbconn = None
+        self.stmt = None
 
     def build_output_view_name(self):
         return 'mysql (%s): %s' % (self.selected_database, self.source_tab)
@@ -214,9 +216,7 @@ class SaveView:
         for connection in connections_list:
             if connection.get('name') == database:
                 self.conn_params = connection
-
-        thread = DatabaseConnectorThread(self)
-        thread.start()
+        self.start_query()
 
     def connect_to_database(self):
         self.dbconn = None
@@ -229,9 +229,8 @@ class SaveView:
             sublime.set_timeout(lambda: self.output_text(True, str(excpt) + "\n"), 1)
         return self.dbconn
 
-    def start_query(self, stmt):
-        self.output_text(True, stmt)
-        thread = QueryRunnerThread(self, stmt, self.table_builder)
+    def start_query(self):
+        thread = QueryRunnerThread(self, self.stmt, self.table_builder)
         thread.start()
 
     def save_view(self, view, source_tab):
@@ -256,6 +255,9 @@ class SaveView:
 
     def has_picked_database(self):
         return (self.selected_database != None)
+
+    def save_stmt(self, stmt):
+        self.stmt = stmt
 
 
 class RunMysqlCommand(sublime_plugin.TextCommand):
@@ -304,8 +306,9 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
             self.save_output_view.output_text(True, stmt + "\nunable to find statement")
             return
 
+        self.save_output_view.save_stmt(stmt)
         if self.save_output_view.has_picked_database():
-            self.save_output_view.start_query(stmt)
+            self.save_output_view.start_query()
         else:
             self.save_output_view.pick_database()
 
