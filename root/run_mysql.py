@@ -140,13 +140,14 @@ class QueryRunnerThread(threading.Thread):
 
 
 class SaveView:
-    RECONNECT_MYSQL_ERRORS = frozenset([2006])
+    RECONNECT_MYSQL_ERRORS = frozenset([2006, 2013])
 
     def __init__(self):
         self.view = None
         self.source_tab = None
         self.table_builder = AsciiTableBuilder()
         self.selected_database = None
+        self.dbconn = None
 
     def build_output_view_name(self):
         return 'mysql (%s): %s' % (self.selected_database, self.source_tab)
@@ -199,19 +200,22 @@ class SaveView:
         if excpt == None:
             return
         error_code = excpt.args[0]
-
-        # if error_code in self.RECONNECT_MYSQL_ERRORS:
-        #     self.dbconn = None
+        if error_code in self.RECONNECT_MYSQL_ERRORS:
+            self.dbconn = None
 
     def save_view(self, view, source_tab):
         self.view = view
         self.source_tab = source_tab
+        self.dbconn = None
 
     def get_view(self):
         return self.view
 
     def has_view(self):
         return (not (self.view is None)) and (not (self.view.window() is None))
+
+    def has_dbconn(self):
+        return (not (self.dbconn is None))
 
 
 class RunMysqlCommand(sublime_plugin.TextCommand):
@@ -254,15 +258,16 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         else:
             stmt = self.view.substr(region).strip()
 
-        output_view = self.get_output_view()
-        if output_view == None:
-            return
+        self.ensure_output_view()
 
         if len(stmt) == 0:
             self.save_output_view.output_text(True, stmt + "\nunable to find statement")
             return
 
-        self.save_output_view.start_query(stmt)
+        if self.save_output_view.has_dbconn():
+            self.save_output_view.start_query(stmt)
+        else:
+            self.save_output_view.pick_database()
 
     def has_sqlstmt_start(self, line):
         if len(line) == 0:
@@ -305,9 +310,9 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
 
         return self.view.substr(sublime.Region(begin_stmt, end_stmt)).strip()
 
-    def get_output_view(self):
+    def ensure_output_view(self):
         if self.save_output_view.has_view():
-            return self.save_output_view.get_view()
+            return
         new_view = None
         for window in sublime.windows():
             for check_view in window.views():
@@ -316,9 +321,6 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         if new_view is None:
             new_view = self.build_output_view()
         self.save_output_view.save_view(new_view, self.tab_name)
-        self.save_output_view.pick_database()
-        # if we have to pick a new database, return None for now
-        return None
 
     def build_output_view(self):
         window = sublime.active_window()
