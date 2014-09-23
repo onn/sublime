@@ -96,15 +96,6 @@ class AsciiTableBuilder:
         return retval
 
 
-class DatabaseConnectorThread(threading.Thread):
-    def __init__(self, save_view):
-        self.save_view = save_view
-        threading.Thread.__init__(self)
-
-    def run(self):
-        self.save_view.connect_to_database()
-
-
 class QueryRunnerThread(threading.Thread):
     RECONNECT_MYSQL_ERRORS = frozenset([2006, 2013])
 
