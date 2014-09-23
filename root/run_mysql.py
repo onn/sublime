@@ -210,7 +210,7 @@ class SaveView:
         vals = self.conn_params
         sublime.set_timeout(lambda: self.output_text(True, "connecting to %s on %s:%s as %s" % (vals.get('db'), vals.get('host'), vals.get('port'), vals.get('user'))), 1)
         self.dbconn = connect(vals.get('host'), vals.get('user'), vals.get('pass'), vals.get('db'), vals.get('port'))
-        self.dbconn.cursor().execute('SET autocommit=1')
+        self.dbconn.cursor().execute('SET autocommit=1,sql_safe_updates=1,sql_select_limit=500,max_join_size=1000000')
         sublime.set_timeout(lambda: self.view.set_name(self.build_output_view_name()), 1)
         return self.dbconn
 
