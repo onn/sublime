@@ -147,6 +147,7 @@ class SaveView:
         self.source_tab = None
         self.table_builder = AsciiTableBuilder()
         self.selected_database = None
+        self.conn_params = None
         self.dbconn = None
 
     def build_output_view_name(self):
@@ -167,9 +168,9 @@ class SaveView:
         for connection in sublime.load_settings('onn.sublime-settings').get('connections'):
             self.ui_connection_list.append([connection.get('name'), 'Host: ' + connection.get('host')])
         window = sublime.active_window()
-        window.show_quick_panel(self.ui_connection_list, self.connect_to_database)
+        window.show_quick_panel(self.ui_connection_list, self.database_was_picked)
 
-    def connect_to_database(self, picked):
+    def database_was_picked(self, picked):
         if picked < 0:
             self.selected_database = None
             return
@@ -177,16 +178,18 @@ class SaveView:
         onn_settings = sublime.load_settings('onn.sublime-settings')
         connections_list = onn_settings.get('connections')
 
-        params = {}
         database = self.ui_connection_list[picked][0]
         self.selected_database = database
 
         for connection in connections_list:
             if connection.get('name') == database:
-                params = connection
+                self.conn_params = connection
+        self.connect_to_database()
 
-        self.output_text(True, "connecting to %s on %s:%s as %s" % (params.get('db'), params.get('host'), params.get('port'), params.get('user')))
-        self.dbconn = connect(params.get('host'), params.get('user'), params.get('pass'), params.get('db'), params.get('port'))
+    def connect_to_database(self):
+        vals = self.conn_params
+        self.output_text(True, "connecting to %s on %s:%s as %s" % (vals.get('db'), vals.get('host'), vals.get('port'), vals.get('user')))
+        self.dbconn = connect(vals.get('host'), vals.get('user'), vals.get('pass'), vals.get('db'), vals.get('port'))
         self.dbconn.cursor().execute('SET autocommit=1')
         self.view.set_name(self.build_output_view_name())
 
