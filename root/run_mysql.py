@@ -137,18 +137,18 @@ class QueryRunnerThread(threading.Thread):
             elapsed_str = str(elapsed_amt) + ' sec'
             if cursor.description == None:
                 if self.stmt.lower().find("use") == 0:
-                    return 'database changed\n'
+                    return (None, 'database changed\n')
                 insert_id = cursor.lastrowid
                 if insert_id > 0:
-                    return 'last insert id: ' + str(insert_id) + ' (' + elapsed_str + ')\n'
-                return str(cursor.rowcount) + ' rows affected (' + elapsed_str + ')\n'
+                    return (None, 'last insert id: ' + str(insert_id) + ' (' + elapsed_str + ')\n')
+                return (None, str(cursor.rowcount) + ' rows affected (' + elapsed_str + ')\n')
             data = cursor.fetchall()
             headers = []
             for header_detail in cursor.description:
                 headers.append(header_detail[0])
             row_count = len(data)
             if row_count == 0:
-                return "no rows (" + elapsed_str + ")\n"
+                return (None, "no rows (" + elapsed_str + ")\n")
 
             if self.stmt[-2] == ';':
                 output = self.table_builder.build_line_per_field(data, headers)
