@@ -185,13 +185,13 @@ class SaveView:
                 params = connection
 
         self.output_text(True, "connecting to %s on %s:%s as %s" % (params.get('db'), params.get('host'), params.get('port'), params.get('user')))
-        self.db = connect(params.get('host'), params.get('user'), params.get('pass'), params.get('db'), params.get('port'))
-        self.db.cursor().execute('SET autocommit=1')
+        self.dbconn = connect(params.get('host'), params.get('user'), params.get('pass'), params.get('db'), params.get('port'))
+        self.dbconn.cursor().execute('SET autocommit=1')
         self.view.set_name(self.build_output_view_name())
 
     def start_query(self, stmt):
         self.output_text(True, stmt)
-        thread = QueryRunnerThread(self.db, stmt, self.table_builder, self.query_completed)
+        thread = QueryRunnerThread(self.dbconn, stmt, self.table_builder, self.query_completed)
         thread.start()
 
     def query_completed(self, excpt, text):
@@ -201,7 +201,7 @@ class SaveView:
         error_code = excpt.args[0]
 
         # if error_code in self.RECONNECT_MYSQL_ERRORS:
-        #     self.db = None
+        #     self.dbconn = None
 
     def save_view(self, view, source_tab):
         self.view = view
