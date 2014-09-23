@@ -44,7 +44,7 @@ class AsciiTableBuilder:
         return str
 
     def value_to_string(self, value):
-        if value is None:
+        if value == None:
             return 'NULL'
         return str(value)
 
@@ -134,7 +134,7 @@ class QueryRunnerThread(threading.Thread):
             cursor.execute(self.stmt)
             elapsed_amt = round(time.time() - start_time, 2)
             elapsed_str = str(elapsed_amt) + ' sec'
-            if cursor.description is None:
+            if cursor.description == None:
                 if self.stmt.lower().find("use") == 0:
                     return 'database changed\n'
                 insert_id = cursor.lastrowid
@@ -229,18 +229,18 @@ class SaveView:
         return self.view
 
     def has_view(self):
-        return (not (self.view is None)) and (not (self.view.window() is None))
+        return (self.view != None) and (self.view.window() != None)
 
     def has_dbconn(self):
-        return (not (self.dbconn is None))
+        return (self.dbconn != None)
 
     def get_dbconn(self):
-        if self.dbconn is None:
+        if self.dbconn == None:
             self.connect_to_database()
         return self.dbconn
 
     def has_picked_database(self):
-        return (not (self.selected_database is None))
+        return (self.selected_database != None)
 
 
 class RunMysqlCommand(sublime_plugin.TextCommand):
@@ -343,7 +343,7 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
             for check_view in window.views():
                 if check_view.settings().get('run_mysql_source_file') == self.current_file:
                     new_view = check_view
-        if new_view is None:
+        if new_view == None:
             new_view = self.build_output_view()
         self.save_output_view.save_view(new_view, self.tab_name)
 
