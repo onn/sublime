@@ -99,14 +99,14 @@ class AsciiTableBuilder:
 class QueryRunnerThread(threading.Thread):
     RECONNECT_MYSQL_ERRORS = frozenset([2006, 2013])
 
-    def __init__(self, save_view, stmt, table_builder):
-        self.save_view = save_view
+    def __init__(self, query_core, stmt, table_builder):
+        self.query_core = query_core
         self.stmt = stmt
         self.table_builder = table_builder
         threading.Thread.__init__(self)
 
     def run(self):
-        dbconn = self.save_view.get_dbconn()
+        dbconn = self.query_core.get_dbconn()
         if dbconn == None:
             sublime.set_timeout(lambda: self.on_complete(None, "unable to connect to database"), 1)
             return
@@ -115,17 +115,17 @@ class QueryRunnerThread(threading.Thread):
         error, output = self.run_query_once(dbconn)
         if error != None:
             error_code = error.args[0]
-        sublime.set_timeout(lambda: self.save_view.output_text(False, output), 1)
+        sublime.set_timeout(lambda: self.query_core.output_text(False, output), 1)
 
         if not (error_code in self.RECONNECT_MYSQL_ERRORS):
             return
 
-        dbconn = self.save_view.connect_to_database()
+        dbconn = self.query_core.connect_to_database()
         error, output = self.run_query_once(dbconn)
-        sublime.set_timeout(lambda: self.save_view.output_text(False, output), 1)
+        sublime.set_timeout(lambda: self.query_core.output_text(False, output), 1)
 
     def run_query_once(self, dbconn):
-        sublime.set_timeout(lambda: self.save_view.output_text(True, self.stmt), 1)
+        sublime.set_timeout(lambda: self.query_core.output_text(True, self.stmt), 1)
 
         cursor = dbconn.cursor()
         output = ""
@@ -161,7 +161,7 @@ class QueryRunnerThread(threading.Thread):
         return (error, output)
 
 
-class SaveView:
+class QueryCore:
     def __init__(self):
         self.view = None
         self.source_tab = None
@@ -256,11 +256,11 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
 
     def __init__(self, view):
         super(RunMysqlCommand, self).__init__(view)
-        self.save_output_view = None
+        self.query_core = None
 
     def run(self, edit):
-        if self.save_output_view == None:
-            self.save_output_view = SaveView()
+        if self.query_core == None:
+            self.query_core = QueryCore()
 
         if self.view.settings().get('run_mysql_source_file') != None:
             edit = self.view.begin_edit()
@@ -294,14 +294,14 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         self.ensure_output_view()
 
         if len(stmt) == 0:
-            self.save_output_view.output_text(True, stmt + "\nunable to find statement")
+            self.query_core.output_text(True, stmt + "\nunable to find statement")
             return
 
-        self.save_output_view.save_stmt(stmt)
-        if self.save_output_view.has_picked_database():
-            self.save_output_view.start_query()
+        self.query_core.save_stmt(stmt)
+        if self.query_core.has_picked_database():
+            self.query_core.start_query()
         else:
-            self.save_output_view.pick_database()
+            self.query_core.pick_database()
 
     def has_sqlstmt_start(self, line):
         if len(line) == 0:
@@ -345,7 +345,7 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         return self.view.substr(sublime.Region(begin_stmt, end_stmt)).strip()
 
     def ensure_output_view(self):
-        if self.save_output_view.has_view():
+        if self.query_core.has_view():
             return
         new_view = None
         for window in sublime.windows():
@@ -354,7 +354,7 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
                     new_view = check_view
         if new_view == None:
             new_view = self.build_output_view()
-        self.save_output_view.save_view(new_view, self.tab_name)
+        self.query_core.save_view(new_view, self.tab_name)
 
     def build_output_view(self):
         window = sublime.active_window()
