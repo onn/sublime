@@ -208,10 +208,14 @@ class SaveView:
         self.connect_to_database()
 
     def connect_to_database(self):
+        self.dbconn = None
         vals = self.conn_params
         sublime.set_timeout(lambda: self.output_text(True, "connecting to %s on %s:%s as %s" % (vals.get('db'), vals.get('host'), vals.get('port'), vals.get('user'))), 1)
-        self.dbconn = connect(vals.get('host'), vals.get('user'), vals.get('pass'), vals.get('db'), vals.get('port'))
-        self.dbconn.cursor().execute('SET autocommit=1,sql_safe_updates=1,sql_select_limit=500,max_join_size=1000000')
+        try:
+            self.dbconn = connect(vals.get('host'), vals.get('user'), vals.get('pass'), vals.get('db'), vals.get('port'))
+            self.dbconn.cursor().execute('SET autocommit=1,sql_safe_updates=1,sql_select_limit=500,max_join_size=1000000')
+        except Exception, excpt:
+            sublime.set_timeout(lambda: self.output_text(True, str(excpt) + "\n"), 1)
         return self.dbconn
 
     def start_query(self, stmt):
