@@ -97,15 +97,20 @@ class AsciiTableBuilder:
 
 
 class QueryRunnerThread(threading.Thread):
-    def __init__(self, dbconn, stmt, table_builder, on_complete):
-        self.dbconn = dbconn
+    def __init__(self, save_view, stmt, table_builder, on_complete):
+        self.save_view = save_view
         self.stmt = stmt
         self.table_builder = table_builder
         self.on_complete = on_complete
         threading.Thread.__init__(self)
 
     def run(self):
-        cursor = self.dbconn.cursor()
+        dbconn = self.save_view.get_dbconn()
+        if dbconn == None:
+            self.on_complete(None, "unable to connect to database")
+            return
+
+        cursor = dbconn.cursor()
         output = ""
         error = None
         try:
@@ -180,6 +185,7 @@ class SaveView:
 
         database = self.ui_connection_list[picked][0]
         self.selected_database = database
+        self.dbconn = None
 
         for connection in connections_list:
             if connection.get('name') == database:
@@ -188,14 +194,14 @@ class SaveView:
 
     def connect_to_database(self):
         vals = self.conn_params
-        self.output_text(True, "connecting to %s on %s:%s as %s" % (vals.get('db'), vals.get('host'), vals.get('port'), vals.get('user')))
+        sublime.set_timeout(lambda: self.output_text(True, "connecting to %s on %s:%s as %s" % (vals.get('db'), vals.get('host'), vals.get('port'), vals.get('user'))), 1)
         self.dbconn = connect(vals.get('host'), vals.get('user'), vals.get('pass'), vals.get('db'), vals.get('port'))
         self.dbconn.cursor().execute('SET autocommit=1')
-        self.view.set_name(self.build_output_view_name())
+        sublime.set_timeout(lambda: self.view.set_name(self.build_output_view_name()), 1)
 
     def start_query(self, stmt):
         self.output_text(True, stmt)
-        thread = QueryRunnerThread(self.dbconn, stmt, self.table_builder, self.query_completed)
+        thread = QueryRunnerThread(self, stmt, self.table_builder, self.query_completed)
         thread.start()
 
     def query_completed(self, excpt, text):
@@ -210,6 +216,7 @@ class SaveView:
         self.view = view
         self.source_tab = source_tab
         self.dbconn = None
+        self.selected_database = None
 
     def get_view(self):
         return self.view
@@ -219,6 +226,14 @@ class SaveView:
 
     def has_dbconn(self):
         return (not (self.dbconn is None))
+
+    def get_dbconn(self):
+        if self.dbconn is None:
+            self.connect_to_database()
+        return self.dbconn
+
+    def has_picked_database(self):
+        return (not (self.selected_database is None))
 
 
 class RunMysqlCommand(sublime_plugin.TextCommand):
@@ -267,7 +282,7 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
             self.save_output_view.output_text(True, stmt + "\nunable to find statement")
             return
 
-        if self.save_output_view.has_dbconn():
+        if self.save_output_view.has_picked_database():
             self.save_output_view.start_query(stmt)
         else:
             self.save_output_view.pick_database()
