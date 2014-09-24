@@ -106,7 +106,7 @@ class QueryRunnerThread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        dbconn = self.query_core.get_dbconn()
+        dbconn = self.query_core.get_connection(False)
         if dbconn == None:
             sublime.set_timeout(lambda: self.on_complete(None, "unable to connect to database"), 1)
             return
@@ -120,7 +120,7 @@ class QueryRunnerThread(threading.Thread):
         if not (error_code in self.RECONNECT_MYSQL_ERRORS):
             return
 
-        dbconn = self.query_core.connect_to_database()
+        dbconn = self.query_core.get_connection(True)
         error, output = self.run_query_once(dbconn)
         sublime.set_timeout(lambda: self.query_core.output_text(False, output), 1)
 
@@ -211,7 +211,8 @@ class QueryCore:
     def connect_to_database(self):
         self.dbconn = None
         vals = self.connection_params
-        sublime.set_timeout(lambda: self.output_text(True, "connecting to %s on %s:%s as %s" % (vals.get('db'), vals.get('host'), vals.get('port'), vals.get('user'))), 1)
+        msg = "connecting to %s on %s:%s as %s" % (vals.get('db'), vals.get('host'), vals.get('port'), vals.get('user'))
+        sublime.set_timeout(lambda: self.output_text(True, msg), 1)
         try:
             self.dbconn = connect(vals.get('host'), vals.get('user'), vals.get('pass'), vals.get('db'), vals.get('port'))
             self.dbconn.cursor().execute('SET autocommit=1,sql_safe_updates=1,sql_select_limit=500,max_join_size=1000000')
@@ -228,14 +229,13 @@ class QueryCore:
         self.source_tab_name = source_tab_name
         self.selected_database = self.output_view.settings().get('selected_database')
         self.connection_params = self.output_view.settings().get('connection_params')
-        # do we need this line?
         self.dbconn = None
 
     def has_output_view(self):
         return (self.output_view != None) and (self.output_view.window() != None)
 
-    def get_dbconn(self):
-        if self.dbconn == None:
+    def get_connection(self, force_new):
+        if (self.dbconn == None) or force_new:
             self.connect_to_database()
         return self.dbconn
 
