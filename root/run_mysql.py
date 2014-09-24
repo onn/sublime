@@ -200,13 +200,11 @@ class QueryCore:
         connections_list = onn_settings.get('connections')
 
         database = self.ui_connection_list[picked][0]
-        self.set_selected_database(database)
-        sublime.set_timeout(self.update_output_view_name, 1)
-        self.dbconn = None
-
+        found_connection = None
         for connection in connections_list:
             if connection.get('name') == database:
-                self.conn_params = connection
+                found_connection = connection
+        self.set_selected_database(database, found_connection)
         self.start_query()
 
     def connect_to_database(self):
@@ -244,14 +242,19 @@ class QueryCore:
             self.connect_to_database()
         return self.dbconn
 
-    def set_selected_database(self, value):
-        self.selected_database = value
+    def set_selected_database(self, database, connection_params):
+        self.selected_database = database
+        self.conn_params = connection_params
+        self.dbconn = None
+        sublime.set_timeout(self.update_output_view_name, 1)
 
     def get_selected_database(self):
         return self.selected_database
 
     def clear_selected_database(self):
         self.selected_database = None
+        self.conn_params = None
+        self.dbconn = None
 
     def has_selected_database(self):
         return (self.selected_database != None) and (len(self.selected_database) > 0)
