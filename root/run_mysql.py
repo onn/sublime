@@ -166,12 +166,13 @@ class QueryCore:
         self.output_view = None
         self.source_tab_name = None
         self.table_builder = AsciiTableBuilder()
-        self.conn_params = None
+        self.selected_database = None
+        self.connection_params = None
         self.dbconn = None
         self.stmt = None
 
     def update_output_view_name(self):
-        name = 'mysql (%s): %s' % (self.get_selected_database(), self.source_tab_name)
+        name = 'mysql (%s): %s' % (self.selected_database, self.source_tab_name)
         self.output_view.set_name(name)
 
     def output_text(self, include_timestamp, text):
@@ -209,7 +210,7 @@ class QueryCore:
 
     def connect_to_database(self):
         self.dbconn = None
-        vals = self.conn_params
+        vals = self.connection_params
         sublime.set_timeout(lambda: self.output_text(True, "connecting to %s on %s:%s as %s" % (vals.get('db'), vals.get('host'), vals.get('port'), vals.get('user'))), 1)
         try:
             self.dbconn = connect(vals.get('host'), vals.get('user'), vals.get('pass'), vals.get('db'), vals.get('port'))
@@ -225,7 +226,10 @@ class QueryCore:
     def save_view(self, view, source_tab_name):
         self.output_view = view
         self.source_tab_name = source_tab_name
-        self.clear_selected_database()
+        self.selected_database = self.output_view.settings().get('selected_database')
+        self.connection_params = self.output_view.settings().get('connection_params')
+        # do we need this line?
+        self.dbconn = None
 
     def has_output_view(self):
         return (self.output_view != None) and (self.output_view.window() != None)
@@ -236,21 +240,22 @@ class QueryCore:
         return self.dbconn
 
     def set_selected_database(self, database, connection_params):
+        self.output_view.settings().set('selected_database', database)
         self.selected_database = database
-        self.conn_params = connection_params
+        self.output_view.settings().set('connection_params', connection_params)
+        self.connection_params = connection_params
         self.dbconn = None
         sublime.set_timeout(self.update_output_view_name, 1)
 
-    def get_selected_database(self):
-        return self.selected_database
-
     def clear_selected_database(self):
+        self.output_view.settings().erase('selected_database')
         self.selected_database = None
-        self.conn_params = None
+        self.output_view.settings().erase('connection_params')
+        self.connection_params = None
         self.dbconn = None
 
     def has_selected_database(self):
-        return (self.selected_database != None) and (len(self.selected_database) > 0)
+        return (self.selected_database != None)
 
     def save_stmt(self, stmt):
         self.stmt = stmt
