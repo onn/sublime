@@ -163,26 +163,26 @@ class QueryRunnerThread(threading.Thread):
 
 class QueryCore:
     def __init__(self):
-        self.view = None
-        self.source_tab = None
+        self.output_view = None
+        self.source_tab_name = None
         self.table_builder = AsciiTableBuilder()
         self.conn_params = None
         self.dbconn = None
         self.stmt = None
 
     def update_output_view_name(self):
-        name = 'mysql (%s): %s' % (self.get_selected_database(), self.source_tab)
-        self.view.set_name(name)
+        name = 'mysql (%s): %s' % (self.get_selected_database(), self.source_tab_name)
+        self.output_view.set_name(name)
 
     def output_text(self, include_timestamp, text):
-        edit = self.view.begin_edit()
+        edit = self.output_view.begin_edit()
         if include_timestamp:
             timestr = time.strftime("%Y-%m-%d %H:%M:%S ==> ", time.localtime())
         else:
             timestr = ""
-        self.view.insert(edit, self.view.size(), timestr + text + "\n")
-        self.view.end_edit(edit)
-        self.view.show(self.view.size())
+        self.output_view.insert(edit, self.output_view.size(), timestr + text + "\n")
+        self.output_view.end_edit(edit)
+        self.output_view.show(self.output_view.size())
 
     def pick_database(self):
         self.ui_connection_list = []
@@ -222,20 +222,13 @@ class QueryCore:
         thread = QueryRunnerThread(self, self.stmt, self.table_builder)
         thread.start()
 
-    def save_view(self, view, source_tab):
-        self.view = view
-        self.source_tab = source_tab
-        self.dbconn = None
+    def save_view(self, view, source_tab_name):
+        self.output_view = view
+        self.source_tab_name = source_tab_name
         self.clear_selected_database()
 
-    def get_view(self):
-        return self.view
-
-    def has_view(self):
-        return (self.view != None) and (self.view.window() != None)
-
-    def has_dbconn(self):
-        return (self.dbconn != None)
+    def has_output_view(self):
+        return (self.output_view != None) and (self.output_view.window() != None)
 
     def get_dbconn(self):
         if self.dbconn == None:
@@ -357,7 +350,7 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         return self.view.substr(sublime.Region(begin_stmt, end_stmt)).strip()
 
     def ensure_output_view(self):
-        if self.query_core.has_view():
+        if self.query_core.has_output_view():
             return
         new_view = None
         for window in sublime.windows():
