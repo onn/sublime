@@ -360,7 +360,7 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
         window = sublime.active_window()
         view = window.new_file()
         view.settings().set('run_mysql_source_file', self.current_file)
-        view.settings().set('word_wrap', True)
+        view.settings().set('word_wrap', False)
         view.settings().set("RunInScratch", True)
         view.set_scratch(True)
         return view
