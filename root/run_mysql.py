@@ -166,13 +166,12 @@ class QueryCore:
         self.view = None
         self.source_tab = None
         self.table_builder = AsciiTableBuilder()
-        self.selected_database = None
         self.conn_params = None
         self.dbconn = None
         self.stmt = None
 
     def build_output_view_name(self):
-        return 'mysql (%s): %s' % (self.selected_database, self.source_tab)
+        return 'mysql (%s): %s' % (self.get_selected_database(), self.source_tab)
 
     def output_text(self, include_timestamp, text):
         edit = self.view.begin_edit()
@@ -193,14 +192,14 @@ class QueryCore:
 
     def database_was_picked(self, picked):
         if picked < 0:
-            self.selected_database = None
+            self.clear_selected_database()
             return
 
         onn_settings = sublime.load_settings('onn.sublime-settings')
         connections_list = onn_settings.get('connections')
 
         database = self.ui_connection_list[picked][0]
-        self.selected_database = database
+        self.set_selected_database(database)
         sublime.set_timeout(lambda: self.view.set_name(self.build_output_view_name()), 1)
         self.dbconn = None
 
@@ -228,7 +227,7 @@ class QueryCore:
         self.view = view
         self.source_tab = source_tab
         self.dbconn = None
-        self.selected_database = None
+        self.clear_selected_database()
 
     def get_view(self):
         return self.view
@@ -244,8 +243,17 @@ class QueryCore:
             self.connect_to_database()
         return self.dbconn
 
-    def has_picked_database(self):
-        return (self.selected_database != None)
+    def set_selected_database(self, value):
+        self.selected_database = value
+
+    def get_selected_database(self):
+        return self.selected_database
+
+    def clear_selected_database(self):
+        self.selected_database = None
+
+    def has_selected_database(self):
+        return (self.selected_database != None) and (len(self.selected_database) > 0)
 
     def save_stmt(self, stmt):
         self.stmt = stmt
@@ -298,7 +306,7 @@ class RunMysqlCommand(sublime_plugin.TextCommand):
             return
 
         self.query_core.save_stmt(stmt)
-        if self.query_core.has_picked_database():
+        if self.query_core.has_selected_database():
             self.query_core.start_query()
         else:
             self.query_core.pick_database()
