@@ -170,8 +170,9 @@ class QueryCore:
         self.dbconn = None
         self.stmt = None
 
-    def build_output_view_name(self):
-        return 'mysql (%s): %s' % (self.get_selected_database(), self.source_tab)
+    def update_output_view_name(self):
+        name = 'mysql (%s): %s' % (self.get_selected_database(), self.source_tab)
+        self.view.set_name(name)
 
     def output_text(self, include_timestamp, text):
         edit = self.view.begin_edit()
@@ -200,7 +201,7 @@ class QueryCore:
 
         database = self.ui_connection_list[picked][0]
         self.set_selected_database(database)
-        sublime.set_timeout(lambda: self.view.set_name(self.build_output_view_name()), 1)
+        sublime.set_timeout(self.update_output_view_name, 1)
         self.dbconn = None
 
         for connection in connections_list:
